@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'dart:ui';
 import '../constants/colors.dart';
 import '../models/subscription.dart';
 import '../providers/subscription_provider.dart';
+import '../providers/language_provider.dart';
 
 class AddSubscriptionScreen extends StatefulWidget {
   const AddSubscriptionScreen({super.key});
@@ -61,28 +63,13 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen>
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final languageProvider = Provider.of<LanguageProvider>(context);
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: _buildGlassmorphicAppBar(context, isDark),
+      appBar: _buildGlassmorphicAppBar(context, isDark, languageProvider),
       body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: isDark
-                ? [
-                    AppColors.darkSlate,
-                    AppColors.charcoal,
-                    const Color(0xFF1E1B4B),
-                  ]
-                : [
-                    AppColors.softWhite,
-                    AppColors.lightSurfaceContainer,
-                    const Color(0xFFF5F3FF),
-                  ],
-          ),
-        ),
+        color: isDark ? Colors.black : Colors.white,
         child: FadeTransition(
           opacity: _animationController,
           child: Form(
@@ -90,16 +77,16 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen>
             child: ListView(
               padding: const EdgeInsets.fromLTRB(16, 100, 16, 32),
               children: [
-                _buildSectionTitle('Select Service', isDark),
+                _buildSectionTitle(languageProvider.tr('selectService'), isDark),
                 const SizedBox(height: 16),
-                _buildServiceChips(isDark),
+                _buildServiceChips(isDark, languageProvider),
                 const SizedBox(height: 24),
                 if (_serviceName == 'Custom') ...[
                   _buildGlassInput(
-                    label: 'Custom Service Name',
+                    label: languageProvider.tr('customServiceName'),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter service name';
+                        return languageProvider.tr('pleaseEnterServiceName');
                       }
                       return null;
                     },
@@ -112,13 +99,13 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen>
                   ),
                   const SizedBox(height: 24),
                 ],
-                _buildSectionTitle('Price', isDark),
+                _buildSectionTitle(languageProvider.tr('price'), isDark),
                 const SizedBox(height: 16),
-                _buildPriceRow(isDark),
+                _buildPriceRow(isDark, languageProvider),
                 const SizedBox(height: 24),
-                _buildSectionTitle('Billing Cycle', isDark),
+                _buildSectionTitle(languageProvider.tr('billingCycle'), isDark),
                 const SizedBox(height: 16),
-                _buildBillingCycleSegment(isDark),
+                _buildBillingCycleSegment(isDark, languageProvider),
                 const SizedBox(height: 24),
                 AnimatedSwitcher(
                   duration: const Duration(milliseconds: 400),
@@ -134,10 +121,10 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen>
                       ),
                     );
                   },
-                  child: _buildBillingCycleOptions(isDark),
+                  child: _buildBillingCycleOptions(isDark, languageProvider),
                 ),
                 const SizedBox(height: 32),
-                _buildGlowingButton(context, isDark),
+                _buildGlowingButton(context, isDark, languageProvider),
               ],
             ),
           ),
@@ -146,7 +133,11 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen>
     );
   }
 
-  PreferredSizeWidget _buildGlassmorphicAppBar(BuildContext context, bool isDark) {
+  PreferredSizeWidget _buildGlassmorphicAppBar(
+    BuildContext context,
+    bool isDark,
+    LanguageProvider languageProvider,
+  ) {
     return AppBar(
       backgroundColor: Colors.transparent,
       elevation: 0,
@@ -169,7 +160,7 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen>
         ),
       ),
       title: Text(
-        'Add Subscription',
+        languageProvider.tr('addSubscription'),
         style: TextStyle(
           fontWeight: FontWeight.w600,
           letterSpacing: 0.5,
@@ -191,12 +182,15 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen>
     );
   }
 
-  Widget _buildServiceChips(bool isDark) {
+  Widget _buildServiceChips(bool isDark, LanguageProvider languageProvider) {
     return Wrap(
       spacing: 10,
       runSpacing: 10,
       children: _predefinedServices.map((service) {
         final isSelected = _serviceName == service['name'];
+        final displayName = service['name'] == 'Custom'
+            ? languageProvider.tr('custom')
+            : service['name']!;
         return AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           curve: Curves.easeOut,
@@ -247,7 +241,7 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen>
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       child: Text(
-                        '${service['icon']} ${service['name']}',
+                        '${service['icon']} $displayName',
                         style: TextStyle(
                           fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                           color: Theme.of(context).colorScheme.onSurface,
@@ -308,20 +302,20 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen>
     );
   }
 
-  Widget _buildPriceRow(bool isDark) {
+  Widget _buildPriceRow(bool isDark, LanguageProvider languageProvider) {
     return Row(
       children: [
         Expanded(
           flex: 2,
           child: _buildGlassInput(
-            label: 'Amount',
+            label: languageProvider.tr('amount'),
             keyboardType: TextInputType.number,
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Please enter amount';
+                return languageProvider.tr('pleaseEnterAmount');
               }
               if (double.tryParse(value) == null) {
-                return 'Invalid amount';
+                return languageProvider.tr('invalidAmount');
               }
               return null;
             },
@@ -386,7 +380,7 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen>
     );
   }
 
-  Widget _buildBillingCycleSegment(bool isDark) {
+  Widget _buildBillingCycleSegment(bool isDark, LanguageProvider languageProvider) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(20),
       child: BackdropFilter(
@@ -404,18 +398,18 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen>
           ),
           padding: const EdgeInsets.all(4),
           child: SegmentedButton<BillingCycle>(
-            segments: const [
+            segments: [
               ButtonSegment(
                 value: BillingCycle.weekly,
-                label: Text('Weekly'),
+                label: Text(languageProvider.tr('weekly')),
               ),
               ButtonSegment(
                 value: BillingCycle.monthly,
-                label: Text('Monthly'),
+                label: Text(languageProvider.tr('monthly')),
               ),
               ButtonSegment(
                 value: BillingCycle.yearly,
-                label: Text('Yearly'),
+                label: Text(languageProvider.tr('yearly')),
               ),
             ],
             selected: {_billingCycle},
@@ -438,25 +432,25 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen>
     );
   }
 
-  Widget _buildBillingCycleOptions(bool isDark) {
+  Widget _buildBillingCycleOptions(bool isDark, LanguageProvider languageProvider) {
     switch (_billingCycle) {
       case BillingCycle.weekly:
         return Column(
           key: const ValueKey('weekly'),
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildSectionTitle('Select Day of Week', isDark),
+            _buildSectionTitle(languageProvider.tr('selectDayOfWeek'), isDark),
             const SizedBox(height: 12),
             _buildGlassDropdown(
               value: _dayOfWeek,
-              items: const [
-                DropdownMenuItem(value: 1, child: Text('Monday')),
-                DropdownMenuItem(value: 2, child: Text('Tuesday')),
-                DropdownMenuItem(value: 3, child: Text('Wednesday')),
-                DropdownMenuItem(value: 4, child: Text('Thursday')),
-                DropdownMenuItem(value: 5, child: Text('Friday')),
-                DropdownMenuItem(value: 6, child: Text('Saturday')),
-                DropdownMenuItem(value: 7, child: Text('Sunday')),
+              items: [
+                DropdownMenuItem(value: 1, child: Text(languageProvider.tr('monday'))),
+                DropdownMenuItem(value: 2, child: Text(languageProvider.tr('tuesday'))),
+                DropdownMenuItem(value: 3, child: Text(languageProvider.tr('wednesday'))),
+                DropdownMenuItem(value: 4, child: Text(languageProvider.tr('thursday'))),
+                DropdownMenuItem(value: 5, child: Text(languageProvider.tr('friday'))),
+                DropdownMenuItem(value: 6, child: Text(languageProvider.tr('saturday'))),
+                DropdownMenuItem(value: 7, child: Text(languageProvider.tr('sunday'))),
               ],
               onChanged: (value) {
                 setState(() {
@@ -473,7 +467,7 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen>
           key: const ValueKey('monthly'),
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildSectionTitle('Select Day of Month', isDark),
+            _buildSectionTitle(languageProvider.tr('selectDayOfMonth'), isDark),
             const SizedBox(height: 12),
             _buildGlassDropdown(
               value: _dayOfMonth,
@@ -499,27 +493,27 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen>
           key: const ValueKey('yearly'),
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildSectionTitle('Select Month and Day', isDark),
+            _buildSectionTitle(languageProvider.tr('selectMonthAndDay'), isDark),
             const SizedBox(height: 12),
             Row(
               children: [
                 Expanded(
                   child: _buildGlassDropdown(
                     value: _month,
-                    label: 'Month',
-                    items: const [
-                      DropdownMenuItem(value: 1, child: Text('January')),
-                      DropdownMenuItem(value: 2, child: Text('February')),
-                      DropdownMenuItem(value: 3, child: Text('March')),
-                      DropdownMenuItem(value: 4, child: Text('April')),
-                      DropdownMenuItem(value: 5, child: Text('May')),
-                      DropdownMenuItem(value: 6, child: Text('June')),
-                      DropdownMenuItem(value: 7, child: Text('July')),
-                      DropdownMenuItem(value: 8, child: Text('August')),
-                      DropdownMenuItem(value: 9, child: Text('September')),
-                      DropdownMenuItem(value: 10, child: Text('October')),
-                      DropdownMenuItem(value: 11, child: Text('November')),
-                      DropdownMenuItem(value: 12, child: Text('December')),
+                    label: languageProvider.tr('month'),
+                    items: [
+                      DropdownMenuItem(value: 1, child: Text(languageProvider.tr('january'))),
+                      DropdownMenuItem(value: 2, child: Text(languageProvider.tr('february'))),
+                      DropdownMenuItem(value: 3, child: Text(languageProvider.tr('march'))),
+                      DropdownMenuItem(value: 4, child: Text(languageProvider.tr('april'))),
+                      DropdownMenuItem(value: 5, child: Text(languageProvider.tr('may'))),
+                      DropdownMenuItem(value: 6, child: Text(languageProvider.tr('june'))),
+                      DropdownMenuItem(value: 7, child: Text(languageProvider.tr('july'))),
+                      DropdownMenuItem(value: 8, child: Text(languageProvider.tr('august'))),
+                      DropdownMenuItem(value: 9, child: Text(languageProvider.tr('september'))),
+                      DropdownMenuItem(value: 10, child: Text(languageProvider.tr('october'))),
+                      DropdownMenuItem(value: 11, child: Text(languageProvider.tr('november'))),
+                      DropdownMenuItem(value: 12, child: Text(languageProvider.tr('december'))),
                     ],
                     onChanged: (value) {
                       setState(() {
@@ -533,7 +527,7 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen>
                 Expanded(
                   child: _buildGlassDropdown(
                     value: _dayOfMonth,
-                    label: 'Day',
+                    label: languageProvider.tr('day'),
                     items: List.generate(
                       31,
                       (index) => DropdownMenuItem(
@@ -601,7 +595,7 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen>
     );
   }
 
-  Widget _buildGlowingButton(BuildContext context, bool isDark) {
+  Widget _buildGlowingButton(BuildContext context, bool isDark, LanguageProvider languageProvider) {
     return AnimatedScale(
       scale: _isButtonPressed ? 0.95 : 1.0,
       duration: const Duration(milliseconds: 100),
@@ -631,12 +625,12 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen>
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              onTap: _saveSubscription,
+              onTap: () => _saveSubscription(languageProvider),
               borderRadius: BorderRadius.circular(28),
-              child: const Center(
+              child: Center(
                 child: Text(
-                  'Add Subscription',
-                  style: TextStyle(
+                  languageProvider.tr('addSubscription'),
+                  style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
@@ -651,12 +645,10 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen>
     );
   }
 
-  void _saveSubscription() {
+  void _saveSubscription(LanguageProvider languageProvider) {
     if (_formKey.currentState!.validate()) {
       if (_serviceName.isEmpty || _serviceName == 'Custom') {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please select or enter a service name')),
-        );
+        _showCustomToast(context, languageProvider.tr('pleaseSelectService'));
         return;
       }
 
@@ -676,11 +668,35 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen>
       Provider.of<SubscriptionProvider>(context, listen: false)
           .addSubscription(subscription);
 
-      Navigator.pop(context);
+      _showCustomToast(context, languageProvider.tr('subscriptionAdded'), isSuccess: true);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Subscription added successfully')),
-      );
+      Navigator.pop(context);
     }
+  }
+
+  void _showCustomToast(BuildContext context, String message, {bool isSuccess = false}) {
+    final fToast = FToast();
+    fToast.init(context);
+
+    Widget toast = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(25),
+        color: isSuccess ? Colors.green : Colors.black87,
+      ),
+      child: Text(
+        message,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 14,
+        ),
+      ),
+    );
+
+    fToast.showToast(
+      child: toast,
+      gravity: ToastGravity.BOTTOM,
+      toastDuration: const Duration(seconds: 2),
+    );
   }
 }

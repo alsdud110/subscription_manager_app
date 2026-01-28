@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'dart:async';
+import '../providers/language_provider.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -58,21 +60,29 @@ class _SplashScreenState extends State<SplashScreen> {
                 ),
               ),
               const SizedBox(height: 30),
-              const Text(
-                'Subscription Manager',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-              const SizedBox(height: 10),
-              const Text(
-                'Manage your subscriptions easily',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.white70,
-                ),
+              Consumer<LanguageProvider>(
+                builder: (context, languageProvider, child) {
+                  return Column(
+                    children: [
+                      Text(
+                        languageProvider.tr('subscriptionManager'),
+                        style: const TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        languageProvider.tr('manageSubscriptionsEasily'),
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.white70,
+                        ),
+                      ),
+                    ],
+                  );
+                },
               ),
             ],
           ),

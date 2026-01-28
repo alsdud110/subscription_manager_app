@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'dart:ui';
 import '../models/subscription.dart';
 import '../providers/subscription_provider.dart';
+import '../providers/language_provider.dart';
 
 class SubscriptionBottomSheet extends StatefulWidget {
   final DateTime date;
@@ -16,7 +18,8 @@ class SubscriptionBottomSheet extends StatefulWidget {
   });
 
   @override
-  State<SubscriptionBottomSheet> createState() => _SubscriptionBottomSheetState();
+  State<SubscriptionBottomSheet> createState() =>
+      _SubscriptionBottomSheetState();
 }
 
 class _SubscriptionBottomSheetState extends State<SubscriptionBottomSheet>
@@ -37,7 +40,7 @@ class _SubscriptionBottomSheetState extends State<SubscriptionBottomSheet>
       curve: Curves.easeOut,
     );
     _animationController.forward();
-    
+
     Future.delayed(const Duration(milliseconds: 50), () {
       if (mounted) {
         setState(() {
@@ -55,7 +58,10 @@ class _SubscriptionBottomSheetState extends State<SubscriptionBottomSheet>
 
   @override
   Widget build(BuildContext context) {
-    final dateFormat = DateFormat('MMMM d, yyyy');
+    final languageProvider = Provider.of<LanguageProvider>(context);
+    final dateFormat = languageProvider.isKorean
+        ? DateFormat('yyyy년 M월 d일')
+        : DateFormat('MMMM d, yyyy');
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return FadeTransition(
@@ -91,19 +97,21 @@ class _SubscriptionBottomSheetState extends State<SubscriptionBottomSheet>
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildHeader(context, dateFormat, isDark),
+                _buildHeader(context, dateFormat, isDark, languageProvider),
                 const SizedBox(height: 24),
                 Flexible(
                   child: ListView.separated(
                     shrinkWrap: true,
                     itemCount: widget.subscriptions.length,
-                    separatorBuilder: (context, index) => const SizedBox(height: 12),
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(height: 12),
                     itemBuilder: (context, index) {
                       return _buildAnimatedListItem(
                         context,
                         widget.subscriptions[index],
                         index,
                         isDark,
+                        languageProvider,
                       );
                     },
                   ),
@@ -117,7 +125,8 @@ class _SubscriptionBottomSheetState extends State<SubscriptionBottomSheet>
     );
   }
 
-  Widget _buildHeader(BuildContext context, DateFormat dateFormat, bool isDark) {
+  Widget _buildHeader(BuildContext context, DateFormat dateFormat, bool isDark,
+      LanguageProvider languageProvider) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -143,10 +152,11 @@ class _SubscriptionBottomSheetState extends State<SubscriptionBottomSheet>
               ),
               const SizedBox(height: 6),
               Text(
-                '${widget.subscriptions.length} subscription(s)',
+                '${widget.subscriptions.length} ${languageProvider.tr('subscriptions')}',
                 style: TextStyle(
                   fontSize: 14,
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                  color:
+                      Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -172,6 +182,7 @@ class _SubscriptionBottomSheetState extends State<SubscriptionBottomSheet>
     Subscription subscription,
     int index,
     bool isDark,
+    LanguageProvider languageProvider,
   ) {
     return AnimatedSlide(
       duration: Duration(milliseconds: 300 + (index * 100)),
@@ -222,7 +233,10 @@ class _SubscriptionBottomSheetState extends State<SubscriptionBottomSheet>
                   child: Text(
                     subscription.getBillingInfo(),
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withOpacity(0.6),
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
                     ),
@@ -235,7 +249,10 @@ class _SubscriptionBottomSheetState extends State<SubscriptionBottomSheet>
                       shaderCallback: (bounds) => LinearGradient(
                         colors: isDark
                             ? [const Color(0xFF00D9FF), const Color(0xFF39FF14)]
-                            : [const Color(0xFF0066CC), const Color(0xFF0099FF)],
+                            : [
+                                const Color(0xFF0066CC),
+                                const Color(0xFF0099FF)
+                              ],
                       ).createShader(bounds),
                       child: Text(
                         subscription.getFormattedAmount(),
@@ -248,7 +265,8 @@ class _SubscriptionBottomSheetState extends State<SubscriptionBottomSheet>
                       ),
                     ),
                     const SizedBox(width: 8),
-                    _buildDeleteButton(context, subscription, isDark),
+                    _buildDeleteButton(
+                        context, subscription, isDark, languageProvider),
                   ],
                 ),
               ),
@@ -300,7 +318,8 @@ class _SubscriptionBottomSheetState extends State<SubscriptionBottomSheet>
     );
   }
 
-  Widget _buildDeleteButton(BuildContext context, Subscription subscription, bool isDark) {
+  Widget _buildDeleteButton(BuildContext context, Subscription subscription,
+      bool isDark, LanguageProvider languageProvider) {
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: 0.0, end: 1.0),
       duration: const Duration(milliseconds: 400),
@@ -322,7 +341,7 @@ class _SubscriptionBottomSheetState extends State<SubscriptionBottomSheet>
               color: Colors.red,
               iconSize: 22,
               onPressed: () {
-                _showDeleteDialog(context, subscription);
+                _showDeleteDialog(context, subscription, languageProvider);
               },
             ),
           ),
@@ -331,7 +350,8 @@ class _SubscriptionBottomSheetState extends State<SubscriptionBottomSheet>
     );
   }
 
-  void _showDeleteDialog(BuildContext context, Subscription subscription) {
+  void _showDeleteDialog(BuildContext context, Subscription subscription,
+      LanguageProvider languageProvider) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     showDialog(
@@ -344,18 +364,16 @@ class _SubscriptionBottomSheetState extends State<SubscriptionBottomSheet>
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(28),
             ),
-            backgroundColor: isDark
-                ? const Color(0xFF1A1F3A)
-                : Colors.white,
+            backgroundColor: isDark ? const Color(0xFF1A1F3A) : Colors.white,
             title: Text(
-              'Delete Subscription',
+              languageProvider.tr('deleteSubscription'),
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             content: Text(
-              'Are you sure you want to delete "${subscription.serviceName}"?',
+              '"${subscription.serviceName}" ${languageProvider.tr('deleteConfirm')}',
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
               ),
@@ -364,9 +382,12 @@ class _SubscriptionBottomSheetState extends State<SubscriptionBottomSheet>
               TextButton(
                 onPressed: () => Navigator.pop(dialogContext),
                 child: Text(
-                  'Cancel',
+                  languageProvider.tr('cancel'),
                   style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withOpacity(0.6),
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -389,22 +410,13 @@ class _SubscriptionBottomSheetState extends State<SubscriptionBottomSheet>
                   onPressed: () {
                     Provider.of<SubscriptionProvider>(context, listen: false)
                         .deleteSubscription(subscription.id);
+                    _showCustomToast(context, languageProvider.tr('subscriptionDeleted'), isSuccess: true);
                     Navigator.pop(dialogContext);
                     Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: const Text('Subscription deleted successfully'),
-                        backgroundColor: Colors.green,
-                        behavior: SnackBarBehavior.floating,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                    );
                   },
-                  child: const Text(
-                    'Delete',
-                    style: TextStyle(
+                  child: Text(
+                    languageProvider.tr('delete'),
+                    style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
                     ),
@@ -415,6 +427,32 @@ class _SubscriptionBottomSheetState extends State<SubscriptionBottomSheet>
           ),
         );
       },
+    );
+  }
+
+  void _showCustomToast(BuildContext context, String message, {bool isSuccess = false}) {
+    final fToast = FToast();
+    fToast.init(context);
+
+    Widget toast = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(25),
+        color: isSuccess ? Colors.green : Colors.black87,
+      ),
+      child: Text(
+        message,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 14,
+        ),
+      ),
+    );
+
+    fToast.showToast(
+      child: toast,
+      gravity: ToastGravity.BOTTOM,
+      toastDuration: const Duration(seconds: 2),
     );
   }
 }

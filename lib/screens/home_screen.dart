@@ -5,9 +5,11 @@ import 'dart:ui';
 import '../constants/colors.dart';
 import '../providers/theme_provider.dart';
 import '../providers/subscription_provider.dart';
+import '../providers/language_provider.dart';
 import '../widgets/subscription_bottom_sheet.dart';
 import '../widgets/summary_cards.dart';
 import 'add_subscription_screen.dart';
+import 'settings_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -47,29 +49,15 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final subscriptionProvider = Provider.of<SubscriptionProvider>(context);
+    final languageProvider = Provider.of<LanguageProvider>(context);
     final isDark = themeProvider.isDarkMode;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: _buildGlassmorphicAppBar(context, themeProvider),
+      appBar: _buildGlassmorphicAppBar(context, themeProvider, languageProvider),
+      floatingActionButton: _buildFloatingActionButton(context, isDark),
       body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: isDark
-                ? [
-                    AppColors.darkSlate,
-                    AppColors.charcoal,
-                    const Color(0xFF1E1B4B),
-                  ]
-                : [
-                    AppColors.softWhite,
-                    AppColors.lightSurfaceContainer,
-                    const Color(0xFFF5F3FF),
-                  ],
-          ),
-        ),
+        color: isDark ? Colors.black : Colors.white,
         child: subscriptionProvider.isLoading
             ? const Center(child: CircularProgressIndicator())
             : FadeTransition(
@@ -90,7 +78,11 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     );
   }
 
-  PreferredSizeWidget _buildGlassmorphicAppBar(BuildContext context, ThemeProvider themeProvider) {
+  PreferredSizeWidget _buildGlassmorphicAppBar(
+    BuildContext context,
+    ThemeProvider themeProvider,
+    LanguageProvider languageProvider,
+  ) {
     return AppBar(
       backgroundColor: Colors.transparent,
       elevation: 0,
@@ -113,7 +105,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         ),
       ),
       title: Text(
-        'Subscription Manager',
+        languageProvider.tr('subscriptionManager'),
         style: TextStyle(
           fontWeight: FontWeight.w600,
           letterSpacing: 0.5,
@@ -121,7 +113,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         ),
       ),
       leading: _buildAnimatedThemeToggle(themeProvider),
-      actions: [_buildAnimatedAddButton(context)],
+      actions: [_buildSettingsButton(context)],
     );
   }
 
@@ -146,56 +138,87 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     );
   }
 
-  Widget _buildAnimatedAddButton(BuildContext context) {
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 0.0, end: 1.0),
-      duration: const Duration(milliseconds: 600),
-      curve: Curves.elasticOut,
-      builder: (context, value, child) {
-        return Transform.scale(
-          scale: value,
-          child: Container(
-            margin: const EdgeInsets.only(right: 8),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
-                  blurRadius: 12,
-                  spreadRadius: 2,
-                ),
-              ],
-            ),
-            child: IconButton(
-              icon: const Icon(Icons.add),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  PageRouteBuilder(
-                    pageBuilder: (context, animation, secondaryAnimation) =>
-                        const AddSubscriptionScreen(),
-                    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                      return FadeTransition(
-                        opacity: animation,
-                        child: SlideTransition(
-                          position: Tween<Offset>(
-                            begin: const Offset(0, 0.1),
-                            end: Offset.zero,
-                          ).animate(CurvedAnimation(
-                            parent: animation,
-                            curve: Curves.easeOut,
-                          )),
-                          child: child,
-                        ),
-                      );
-                    },
+  Widget _buildSettingsButton(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(right: 8),
+      child: IconButton(
+        icon: const Icon(Icons.settings),
+        onPressed: () {
+          Navigator.push(
+            context,
+            PageRouteBuilder(
+              pageBuilder: (context, animation, secondaryAnimation) =>
+                  const SettingsScreen(),
+              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                return FadeTransition(
+                  opacity: animation,
+                  child: SlideTransition(
+                    position: Tween<Offset>(
+                      begin: const Offset(0, -0.1),
+                      end: Offset.zero,
+                    ).animate(CurvedAnimation(
+                      parent: animation,
+                      curve: Curves.easeOut,
+                    )),
+                    child: child,
                   ),
                 );
               },
             ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildFloatingActionButton(BuildContext context, bool isDark) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: isDark
+              ? [AppColors.darkPrimary, AppColors.secondary]
+              : [AppColors.primary, AppColors.secondary],
+        ),
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: (isDark ? AppColors.darkPrimary : AppColors.primary)
+                .withOpacity(0.4),
+            blurRadius: 16,
+            spreadRadius: 2,
+            offset: const Offset(0, 4),
           ),
-        );
-      },
+        ],
+      ),
+      child: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            PageRouteBuilder(
+              pageBuilder: (context, animation, secondaryAnimation) =>
+                  const AddSubscriptionScreen(),
+              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                return FadeTransition(
+                  opacity: animation,
+                  child: SlideTransition(
+                    position: Tween<Offset>(
+                      begin: const Offset(0, 0.1),
+                      end: Offset.zero,
+                    ).animate(CurvedAnimation(
+                      parent: animation,
+                      curve: Curves.easeOut,
+                    )),
+                    child: child,
+                  ),
+                );
+              },
+            ),
+          );
+        },
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        child: const Icon(Icons.add, color: Colors.white, size: 28),
+      ),
     );
   }
 

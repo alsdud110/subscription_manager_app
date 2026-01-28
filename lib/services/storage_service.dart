@@ -5,6 +5,7 @@ import '../models/subscription.dart';
 class StorageService {
   static const String _subscriptionsKey = 'subscriptions';
   static const String _themeKey = 'isDarkMode';
+  static const String _languageKey = 'languageCode';
 
   Future<void> saveSubscriptions(List<Subscription> subscriptions) async {
     final prefs = await SharedPreferences.getInstance();
@@ -36,5 +37,15 @@ class StorageService {
   Future<bool> loadThemeMode() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getBool(_themeKey) ?? false;
+  }
+
+  Future<void> saveLanguage(String languageCode) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_languageKey, languageCode);
+  }
+
+  Future<String> loadLanguage() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_languageKey) ?? 'ko'; // Default to Korean
   }
 }

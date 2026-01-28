@@ -5,6 +5,7 @@ import 'dart:ui';
 import '../constants/colors.dart';
 import '../models/subscription.dart';
 import '../providers/subscription_provider.dart';
+import '../providers/language_provider.dart';
 
 class SummaryCards extends StatefulWidget {
   const SummaryCards({super.key});
@@ -60,6 +61,7 @@ class _SummaryCardsState extends State<SummaryCards> with TickerProviderStateMix
   @override
   Widget build(BuildContext context) {
     final subscriptionProvider = Provider.of<SubscriptionProvider>(context);
+    final languageProvider = Provider.of<LanguageProvider>(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final weeklyKrw = subscriptionProvider.getWeeklyTotal(Currency.krw);
@@ -77,7 +79,7 @@ class _SummaryCardsState extends State<SummaryCards> with TickerProviderStateMix
               opacity: _fadeAnimation,
               child: _buildFloatingGlassCard(
                 context: context,
-                title: 'Weekly Total',
+                title: languageProvider.tr('weeklyTotal'),
                 icon: Icons.calendar_view_week,
                 krwAmount: weeklyKrw,
                 usdAmount: weeklyUsd,
@@ -85,6 +87,7 @@ class _SummaryCardsState extends State<SummaryCards> with TickerProviderStateMix
                     ? [AppColors.darkPrimary, AppColors.secondary]
                     : [AppColors.primary, AppColors.secondary],
                 glowColor: isDark ? AppColors.darkPrimary : AppColors.primary,
+                noSubscriptionsText: languageProvider.tr('noSubscriptions'),
               ),
             ),
           ),
@@ -95,7 +98,7 @@ class _SummaryCardsState extends State<SummaryCards> with TickerProviderStateMix
               opacity: _fadeAnimation,
               child: _buildFloatingGlassCard(
                 context: context,
-                title: 'Monthly Total',
+                title: languageProvider.tr('monthlyTotal'),
                 icon: Icons.calendar_month,
                 krwAmount: monthlyKrw,
                 usdAmount: monthlyUsd,
@@ -103,6 +106,7 @@ class _SummaryCardsState extends State<SummaryCards> with TickerProviderStateMix
                     ? [AppColors.darkTertiary, AppColors.accent]
                     : [AppColors.accent, AppColors.darkTertiary],
                 glowColor: isDark ? AppColors.darkTertiary : AppColors.accent,
+                noSubscriptionsText: languageProvider.tr('noSubscriptions'),
               ),
             ),
           ),
@@ -119,6 +123,7 @@ class _SummaryCardsState extends State<SummaryCards> with TickerProviderStateMix
     required double usdAmount,
     required List<Color> gradientColors,
     required Color glowColor,
+    required String noSubscriptionsText,
   }) {
     final krwFormatter = NumberFormat.currency(symbol: '₩', decimalDigits: 0);
     final usdFormatter = NumberFormat.currency(symbol: '\$', decimalDigits: 2);
@@ -202,7 +207,7 @@ class _SummaryCardsState extends State<SummaryCards> with TickerProviderStateMix
                         ),
                       if (krwAmount == 0 && usdAmount == 0)
                         Text(
-                          'No subscriptions',
+                          noSubscriptionsText,
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w500,
