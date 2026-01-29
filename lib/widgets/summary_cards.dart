@@ -5,6 +5,7 @@ import '../constants/colors.dart';
 import '../models/subscription.dart';
 import '../providers/subscription_provider.dart';
 import '../providers/language_provider.dart';
+import '../providers/currency_provider.dart';
 
 class SummaryCards extends StatelessWidget {
   const SummaryCards({super.key});
@@ -13,12 +14,31 @@ class SummaryCards extends StatelessWidget {
   Widget build(BuildContext context) {
     final subscriptionProvider = Provider.of<SubscriptionProvider>(context);
     final languageProvider = Provider.of<LanguageProvider>(context);
+    final currencyProvider = Provider.of<CurrencyProvider>(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final weeklyKrw = subscriptionProvider.getWeeklyTotal(Currency.krw);
     final weeklyUsd = subscriptionProvider.getWeeklyTotal(Currency.usd);
     final monthlyKrw = subscriptionProvider.getMonthlyTotal(Currency.krw);
     final monthlyUsd = subscriptionProvider.getMonthlyTotal(Currency.usd);
+
+    // Convert to base currency
+    double weeklyTotal;
+    double monthlyTotal;
+    String currencySymbol;
+    int decimalDigits;
+
+    if (currencyProvider.isKrwBase) {
+      weeklyTotal = weeklyKrw + currencyProvider.convertToBaseCurrency(weeklyUsd, Currency.usd);
+      monthlyTotal = monthlyKrw + currencyProvider.convertToBaseCurrency(monthlyUsd, Currency.usd);
+      currencySymbol = '₩';
+      decimalDigits = 0;
+    } else {
+      weeklyTotal = weeklyUsd + currencyProvider.convertToBaseCurrency(weeklyKrw, Currency.krw);
+      monthlyTotal = monthlyUsd + currencyProvider.convertToBaseCurrency(monthlyKrw, Currency.krw);
+      currencySymbol = '\$';
+      decimalDigits = 2;
+    }
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -27,10 +47,11 @@ class SummaryCards extends StatelessWidget {
           Expanded(
             child: _buildSummaryCard(
               context: context,
-              title: 'WEEKLY TOTAL',
+              title: languageProvider.tr('weeklyTotal').toUpperCase(),
               icon: Icons.date_range_outlined,
-              krwAmount: weeklyKrw,
-              usdAmount: weeklyUsd,
+              totalAmount: weeklyTotal,
+              currencySymbol: currencySymbol,
+              decimalDigits: decimalDigits,
               isDark: isDark,
               noSubscriptionsText: languageProvider.tr('noSubscriptions'),
             ),
@@ -39,10 +60,11 @@ class SummaryCards extends StatelessWidget {
           Expanded(
             child: _buildSummaryCard(
               context: context,
-              title: 'MONTHLY TOTAL',
+              title: languageProvider.tr('monthlyTotal').toUpperCase(),
               icon: Icons.calendar_month_outlined,
-              krwAmount: monthlyKrw,
-              usdAmount: monthlyUsd,
+              totalAmount: monthlyTotal,
+              currencySymbol: currencySymbol,
+              decimalDigits: decimalDigits,
               isDark: isDark,
               noSubscriptionsText: languageProvider.tr('noSubscriptions'),
             ),
@@ -56,13 +78,13 @@ class SummaryCards extends StatelessWidget {
     required BuildContext context,
     required String title,
     required IconData icon,
-    required double krwAmount,
-    required double usdAmount,
+    required double totalAmount,
+    required String currencySymbol,
+    required int decimalDigits,
     required bool isDark,
     required String noSubscriptionsText,
   }) {
-    final krwFormatter = NumberFormat.currency(symbol: '₩', decimalDigits: 0);
-    final usdFormatter = NumberFormat.currency(symbol: '\$', decimalDigits: 2);
+    final formatter = NumberFormat.currency(symbol: currencySymbol, decimalDigits: decimalDigits);
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -83,30 +105,17 @@ class SummaryCards extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          if (krwAmount > 0 || usdAmount > 0) ...[
-            if (krwAmount > 0)
-              Text(
-                krwFormatter.format(krwAmount),
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  color: isDark ? AppColors.white : AppColors.black,
-                  letterSpacing: -0.5,
-                ),
+          if (totalAmount > 0)
+            Text(
+              formatter.format(totalAmount),
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: isDark ? AppColors.white : AppColors.black,
+                letterSpacing: -0.5,
               ),
-            if (usdAmount > 0)
-              Text(
-                usdFormatter.format(usdAmount),
-                style: TextStyle(
-                  fontSize: krwAmount > 0 ? 14 : 20,
-                  fontWeight: krwAmount > 0 ? FontWeight.w500 : FontWeight.w700,
-                  color: krwAmount > 0
-                      ? (isDark ? AppColors.gray : AppColors.gray)
-                      : (isDark ? AppColors.white : AppColors.black),
-                  letterSpacing: -0.3,
-                ),
-              ),
-          ] else
+            )
+          else
             Text(
               noSubscriptionsText,
               style: TextStyle(

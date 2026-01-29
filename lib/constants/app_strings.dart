@@ -106,6 +106,19 @@ class AppStrings {
     'everyWeekOn': '매주',
     'everyMonthOn': '매월',
     'everyYearOn': '매년',
+
+    // Theme Names
+    'themeMidnight': '미드나잇',
+    'themeSoftPearl': '소프트 펄',
+
+    // Currency Settings
+    'currency': '통화',
+    'baseCurrency': '기준 통화',
+    'exchangeRate': '환율',
+    'exchangeRateDescription': '1 USD = ? KRW',
+    'krwFull': '원 (KRW)',
+    'usdFull': '달러 (USD)',
+    'save': '저장',
   };
 
   // English strings
@@ -200,5 +213,18 @@ class AppStrings {
     'everyWeekOn': 'Every week on',
     'everyMonthOn': 'Every month on',
     'everyYearOn': 'Every year on',
+
+    // Theme Names
+    'themeMidnight': 'Midnight',
+    'themeSoftPearl': 'Soft Pearl',
+
+    // Currency Settings
+    'currency': 'Currency',
+    'baseCurrency': 'Base Currency',
+    'exchangeRate': 'Exchange Rate',
+    'exchangeRateDescription': '1 USD = ? KRW',
+    'krwFull': 'Won (KRW)',
+    'usdFull': 'Dollar (USD)',
+    'save': 'Save',
   };
 }

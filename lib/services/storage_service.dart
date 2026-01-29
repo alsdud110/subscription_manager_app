@@ -6,6 +6,8 @@ class StorageService {
   static const String _subscriptionsKey = 'subscriptions';
   static const String _themeKey = 'isDarkMode';
   static const String _languageKey = 'languageCode';
+  static const String _baseCurrencyKey = 'baseCurrency';
+  static const String _exchangeRateKey = 'exchangeRate';
 
   Future<void> saveSubscriptions(List<Subscription> subscriptions) async {
     final prefs = await SharedPreferences.getInstance();
@@ -47,5 +49,26 @@ class StorageService {
   Future<String> loadLanguage() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString(_languageKey) ?? 'ko'; // Default to Korean
+  }
+
+  // Currency settings
+  Future<void> saveBaseCurrency(String currencyName) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_baseCurrencyKey, currencyName);
+  }
+
+  Future<String> loadBaseCurrency() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_baseCurrencyKey) ?? 'krw'; // Default to KRW
+  }
+
+  Future<void> saveExchangeRate(double rate) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble(_exchangeRateKey, rate);
+  }
+
+  Future<double> loadExchangeRate() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getDouble(_exchangeRateKey) ?? 1350.0; // Default: 1 USD = 1350 KRW
   }
 }

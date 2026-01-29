@@ -42,17 +42,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(height: 8),
                   _buildCalendar(
                       context, subscriptionProvider, isDark, languageProvider),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 12),
-                    child: Text(
-                      isDark ? 'Midnight' : 'Soft Pearl',
-                      style: const TextStyle(
-                        color: AppColors.gray,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
                   const SizedBox(height: 20),
                   const SummaryCards(),
                   const SizedBox(height: 32),
@@ -85,7 +74,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           const SizedBox(width: 8),
           Text(
-            languageProvider.isKorean ? '구독관리' : 'Subscription Manager',
+            languageProvider.tr('subscriptionManager'),
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w600,
@@ -138,7 +127,8 @@ class _HomeScreenState extends State<HomeScreen> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const AddSubscriptionScreen()),
+            MaterialPageRoute(
+                builder: (context) => const AddSubscriptionScreen()),
           );
         },
         backgroundColor: Colors.transparent,
@@ -266,8 +256,8 @@ class _HomeScreenState extends State<HomeScreen> {
             weekendStyle: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
-              color: (isDark ? AppColors.gray : AppColors.gray)
-                  .withOpacity(0.7),
+              color:
+                  (isDark ? AppColors.gray : AppColors.gray).withOpacity(0.7),
             ),
           ),
           calendarBuilders: CalendarBuilders(
