@@ -27,7 +27,7 @@ class ThemeProvider extends ChangeNotifier {
 
   static final ThemeData _lightTheme = ThemeData(
     useMaterial3: true,
-    fontFamily: 'Pretendard',
+    fontFamily: 'Jalnan2',
     colorScheme: const ColorScheme(
       brightness: Brightness.light,
       primary: AppColors.black,
@@ -103,7 +103,7 @@ class ThemeProvider extends ChangeNotifier {
 
   static final ThemeData _darkTheme = ThemeData(
     useMaterial3: true,
-    fontFamily: 'Pretendard',
+    fontFamily: 'Jalnan2',
     colorScheme: const ColorScheme(
       brightness: Brightness.dark,
       primary: AppColors.white,

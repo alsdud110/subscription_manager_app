@@ -119,6 +119,12 @@ class AppStrings {
     'krwFull': '원 (KRW)',
     'usdFull': '달러 (USD)',
     'save': '저장',
+
+    // App Info
+    'appSettings': '앱 설정',
+    'appInfo': '앱 정보',
+    'fontLicense': '폰트 라이선스',
+    'fontLicenseText': '이 앱에는 (주)여기어때컴퍼니가 제공한 여기어때 잘난체가 적용되어 있습니다.',
   };
 
   // English strings
@@ -226,5 +232,11 @@ class AppStrings {
     'krwFull': 'Won (KRW)',
     'usdFull': 'Dollar (USD)',
     'save': 'Save',
+
+    // App Info
+    'appSettings': 'App Settings',
+    'appInfo': 'App Info',
+    'fontLicense': 'Font License',
+    'fontLicenseText': 'This app uses Jalnan font provided by Yanolja Company.',
   };
 }

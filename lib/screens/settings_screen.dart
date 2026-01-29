@@ -24,6 +24,8 @@ class SettingsScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         children: [
           const SizedBox(height: 16),
+          _buildSectionHeader(languageProvider.tr('appSettings'), isDark),
+          const SizedBox(height: 12),
           _buildLanguageOption(context, languageProvider, isDark),
           const SizedBox(height: 12),
           _buildThemeOption(context, themeProvider, languageProvider, isDark),
@@ -33,9 +35,92 @@ class SettingsScreen extends StatelessWidget {
           const SizedBox(height: 12),
           _buildExchangeRateOption(
               context, currencyProvider, languageProvider, isDark),
+          const SizedBox(height: 48),
+          _buildAppInfoSection(context, languageProvider, isDark),
           const SizedBox(height: 32),
         ],
       ),
+    );
+  }
+
+  Widget _buildSectionHeader(String title, bool isDark) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 4),
+      child: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+          color: AppColors.gray,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAppInfoSection(
+    BuildContext context,
+    LanguageProvider languageProvider,
+    bool isDark,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 12),
+          child: Text(
+            languageProvider.tr('appInfo'),
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: AppColors.gray,
+            ),
+          ),
+        ),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: isDark ? AppColors.darkSurfaceContainer : AppColors.white,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: isDark ? AppColors.darkOutline : AppColors.mediumGray,
+              width: 1,
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    Icons.info_outline_rounded,
+                    size: 18,
+                    color: AppColors.gray,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    languageProvider.tr('fontLicense'),
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: isDark ? AppColors.white : AppColors.black,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                languageProvider.tr('fontLicenseText'),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: AppColors.gray,
+                  height: 1.5,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
