@@ -7,8 +7,6 @@ import '../models/subscription.dart';
 import '../providers/theme_provider.dart';
 import '../providers/language_provider.dart';
 import '../providers/currency_provider.dart';
-import 'add_subscription_screen.dart';
-
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
@@ -22,7 +20,6 @@ class SettingsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: isDark ? AppColors.black : AppColors.white,
       appBar: _buildAppBar(context, isDark, languageProvider),
-      floatingActionButton: _buildFab(context),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -31,39 +28,13 @@ class SettingsScreen extends StatelessWidget {
           const SizedBox(height: 12),
           _buildThemeOption(context, themeProvider, languageProvider, isDark),
           const SizedBox(height: 12),
-          _buildBaseCurrencyOption(context, currencyProvider, languageProvider, isDark),
+          _buildBaseCurrencyOption(
+              context, currencyProvider, languageProvider, isDark),
           const SizedBox(height: 12),
-          _buildExchangeRateOption(context, currencyProvider, languageProvider, isDark),
+          _buildExchangeRateOption(
+              context, currencyProvider, languageProvider, isDark),
           const SizedBox(height: 32),
-          _buildVersionInfo(languageProvider, isDark),
         ],
-      ),
-    );
-  }
-
-  Widget _buildFab(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: AppColors.primaryGradient,
-        shape: BoxShape.circle,
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.mint.withValues(alpha: 0.4),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const AddSubscriptionScreen()),
-          );
-        },
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        child: const Icon(Icons.add, color: Colors.white),
       ),
     );
   }
@@ -107,9 +78,7 @@ class SettingsScreen extends StatelessWidget {
         color: isDark ? AppColors.darkSurfaceContainer : AppColors.white,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: isDark
-              ? AppColors.darkOutline
-              : AppColors.mediumGray,
+          color: isDark ? AppColors.darkOutline : AppColors.mediumGray,
           width: 1,
         ),
       ),
@@ -138,7 +107,9 @@ class SettingsScreen extends StatelessWidget {
           ),
         ),
         subtitle: Text(
-          isDark ? languageProvider.tr('darkMode') : languageProvider.tr('lightMode'),
+          isDark
+              ? languageProvider.tr('darkMode')
+              : languageProvider.tr('lightMode'),
           style: TextStyle(
             fontSize: 13,
             color: isDark ? AppColors.gray : AppColors.gray,
@@ -164,9 +135,7 @@ class SettingsScreen extends StatelessWidget {
         color: isDark ? AppColors.darkSurfaceContainer : AppColors.white,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: isDark
-              ? AppColors.darkOutline
-              : AppColors.mediumGray,
+          color: isDark ? AppColors.darkOutline : AppColors.mediumGray,
           width: 1,
         ),
       ),
@@ -221,9 +190,7 @@ class SettingsScreen extends StatelessWidget {
         color: isDark ? AppColors.darkSurfaceContainer : AppColors.white,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: isDark
-              ? AppColors.darkOutline
-              : AppColors.mediumGray,
+          color: isDark ? AppColors.darkOutline : AppColors.mediumGray,
           width: 1,
         ),
       ),
@@ -264,7 +231,8 @@ class SettingsScreen extends StatelessWidget {
           Icons.chevron_right_rounded,
           color: isDark ? AppColors.gray : AppColors.gray,
         ),
-        onTap: () => _showBaseCurrencyDialog(context, currencyProvider, languageProvider, isDark),
+        onTap: () => _showBaseCurrencyDialog(
+            context, currencyProvider, languageProvider, isDark),
       ),
     );
   }
@@ -280,9 +248,7 @@ class SettingsScreen extends StatelessWidget {
         color: isDark ? AppColors.darkSurfaceContainer : AppColors.white,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: isDark
-              ? AppColors.darkOutline
-              : AppColors.mediumGray,
+          color: isDark ? AppColors.darkOutline : AppColors.mediumGray,
           width: 1,
         ),
       ),
@@ -321,7 +287,8 @@ class SettingsScreen extends StatelessWidget {
           Icons.chevron_right_rounded,
           color: isDark ? AppColors.gray : AppColors.gray,
         ),
-        onTap: () => _showExchangeRateDialog(context, currencyProvider, languageProvider, isDark),
+        onTap: () => _showExchangeRateDialog(
+            context, currencyProvider, languageProvider, isDark),
       ),
     );
   }
@@ -498,7 +465,7 @@ class SettingsScreen extends StatelessWidget {
               const SizedBox(height: 8),
               Text(
                 languageProvider.tr('exchangeRateDescription'),
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 14,
                   color: AppColors.gray,
                 ),
@@ -506,10 +473,13 @@ class SettingsScreen extends StatelessWidget {
               const SizedBox(height: 20),
               Container(
                 decoration: BoxDecoration(
-                  color: isDark ? AppColors.darkSurfaceContainer : AppColors.lightGray,
+                  color: isDark
+                      ? AppColors.darkSurfaceContainer
+                      : AppColors.lightGray,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: isDark ? AppColors.darkOutline : AppColors.mediumGray,
+                    color:
+                        isDark ? AppColors.darkOutline : AppColors.mediumGray,
                   ),
                 ),
                 child: Row(
@@ -528,9 +498,11 @@ class SettingsScreen extends StatelessWidget {
                     Expanded(
                       child: TextField(
                         controller: controller,
-                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true),
                         inputFormatters: [
-                          FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+                          FilteringTextInputFormatter.allow(
+                              RegExp(r'^\d+\.?\d{0,2}')),
                         ],
                         textAlign: TextAlign.center,
                         style: TextStyle(
@@ -540,7 +512,8 @@ class SettingsScreen extends StatelessWidget {
                         ),
                         decoration: const InputDecoration(
                           border: InputBorder.none,
-                          contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+                          contentPadding:
+                              EdgeInsets.symmetric(horizontal: 8, vertical: 16),
                         ),
                       ),
                     ),
@@ -612,9 +585,7 @@ class SettingsScreen extends StatelessWidget {
           border: Border.all(
             color: isSelected
                 ? Colors.transparent
-                : (isDark
-                    ? AppColors.darkOutline
-                    : AppColors.mediumGray),
+                : (isDark ? AppColors.darkOutline : AppColors.mediumGray),
             width: 1,
           ),
         ),
@@ -638,18 +609,6 @@ class SettingsScreen extends StatelessWidget {
                 size: 22,
               ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildVersionInfo(LanguageProvider languageProvider, bool isDark) {
-    return Center(
-      child: Text(
-        '${languageProvider.tr('version')} 1.0.0',
-        style: TextStyle(
-          fontSize: 13,
-          color: AppColors.gray.withValues(alpha: 0.6),
         ),
       ),
     );
