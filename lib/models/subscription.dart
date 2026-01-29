@@ -1,6 +1,6 @@
 import 'package:intl/intl.dart';
 
-enum BillingCycle { weekly, monthly, yearly }
+enum BillingCycle { once, weekly, monthly, yearly }
 
 enum Currency { krw, usd }
 
@@ -15,6 +15,7 @@ class Subscription {
   final int? dayOfMonth;
   final int? month;
   final DateTime createdAt;
+  final int colorValue;
 
   Subscription({
     required this.id,
@@ -27,6 +28,7 @@ class Subscription {
     this.dayOfMonth,
     this.month,
     required this.createdAt,
+    this.colorValue = 0xFF6C63FF,
   });
 
   Map<String, dynamic> toJson() {
@@ -41,6 +43,7 @@ class Subscription {
       'dayOfMonth': dayOfMonth,
       'month': month,
       'createdAt': createdAt.toIso8601String(),
+      'colorValue': colorValue,
     };
   }
 
@@ -56,19 +59,25 @@ class Subscription {
       dayOfMonth: json['dayOfMonth'],
       month: json['month'],
       createdAt: DateTime.parse(json['createdAt']),
+      colorValue: json['colorValue'] ?? 0xFF6C63FF,
     );
   }
 
   bool occursOnDate(DateTime date) {
     switch (billingCycle) {
+      case BillingCycle.once:
+        return month != null &&
+               dayOfMonth != null &&
+               date.month == month &&
+               date.day == dayOfMonth;
       case BillingCycle.weekly:
         return dayOfWeek != null && date.weekday == dayOfWeek;
       case BillingCycle.monthly:
         return dayOfMonth != null && date.day == dayOfMonth;
       case BillingCycle.yearly:
-        return month != null && 
-               dayOfMonth != null && 
-               date.month == month && 
+        return month != null &&
+               dayOfMonth != null &&
+               date.month == month &&
                date.day == dayOfMonth;
     }
   }
@@ -83,6 +92,9 @@ class Subscription {
 
   String getBillingInfo() {
     switch (billingCycle) {
+      case BillingCycle.once:
+        final months = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        return 'One-time: ${months[month ?? 1]} ${dayOfMonth}';
       case BillingCycle.weekly:
         final days = ['', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
         return 'Every ${days[dayOfWeek ?? 1]}';

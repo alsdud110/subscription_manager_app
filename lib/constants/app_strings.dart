@@ -17,8 +17,8 @@ class AppStrings {
   // Korean strings (default)
   static const Map<String, String> _koreanStrings = {
     // App
-    'appTitle': '구독 관리',
-    'subscriptionManager': '구독 관리',
+    'appTitle': 'SubTrackr',
+    'subscriptionManager': 'SubTrackr',
 
     // Home Screen
     'noSubscriptions': '구독 없음',
@@ -41,6 +41,7 @@ class AppStrings {
     // Add Subscription Screen
     'addSubscription': '구독 추가',
     'selectService': '서비스 선택',
+    'selectColor': '색상 선택',
     'customServiceName': '사용자 지정 서비스 이름',
     'pleaseEnterServiceName': '서비스 이름을 입력하세요',
     'price': '가격',
@@ -48,6 +49,7 @@ class AppStrings {
     'pleaseEnterAmount': '금액을 입력하세요',
     'invalidAmount': '올바른 금액이 아닙니다',
     'billingCycle': '결제 주기',
+    'once': '일회성',
     'weekly': '주간',
     'monthly': '월간',
     'yearly': '연간',
@@ -109,8 +111,8 @@ class AppStrings {
   // English strings
   static const Map<String, String> _englishStrings = {
     // App
-    'appTitle': 'Subscription Manager',
-    'subscriptionManager': 'Subscription Manager',
+    'appTitle': 'SubTrackr',
+    'subscriptionManager': 'SubTrackr',
 
     // Home Screen
     'noSubscriptions': 'No subscriptions',
@@ -133,6 +135,7 @@ class AppStrings {
     // Add Subscription Screen
     'addSubscription': 'Add Subscription',
     'selectService': 'Select Service',
+    'selectColor': 'Select Color',
     'customServiceName': 'Custom Service Name',
     'pleaseEnterServiceName': 'Please enter service name',
     'price': 'Price',
@@ -140,6 +143,7 @@ class AppStrings {
     'pleaseEnterAmount': 'Please enter amount',
     'invalidAmount': 'Invalid amount',
     'billingCycle': 'Billing Cycle',
+    'once': 'Once',
     'weekly': 'Weekly',
     'monthly': 'Monthly',
     'yearly': 'Yearly',

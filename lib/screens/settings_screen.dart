@@ -1,37 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'dart:ui';
 import '../constants/colors.dart';
 import '../constants/app_strings.dart';
 import '../providers/theme_provider.dart';
 import '../providers/language_provider.dart';
+import 'add_subscription_screen.dart';
 
-class SettingsScreen extends StatefulWidget {
+class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
-
-  @override
-  State<SettingsScreen> createState() => _SettingsScreenState();
-}
-
-class _SettingsScreenState extends State<SettingsScreen>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
-
-  @override
-  void initState() {
-    super.initState();
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 600),
-    );
-    _animationController.forward();
-  }
-
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,106 +16,73 @@ class _SettingsScreenState extends State<SettingsScreen>
     final isDark = themeProvider.isDarkMode;
 
     return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: _buildGlassmorphicAppBar(context, isDark, languageProvider),
-      body: Container(
-        color: isDark ? Colors.black : Colors.white,
-        child: FadeTransition(
-          opacity: _animationController,
-          child: ListView(
-            padding: const EdgeInsets.fromLTRB(16, 100, 16, 32),
-            children: [
-              _buildSectionTitle(languageProvider.tr('appearance'), isDark),
-              const SizedBox(height: 16),
-              _buildThemeOption(context, themeProvider, languageProvider, isDark),
-              const SizedBox(height: 12),
-              _buildLanguageOption(context, languageProvider, isDark),
-              const SizedBox(height: 32),
-              _buildSectionTitle(languageProvider.tr('general'), isDark),
-              const SizedBox(height: 16),
-              _buildSettingItem(
-                context: context,
-                icon: Icons.help_outline,
-                title: languageProvider.tr('helpSupport'),
-                isDark: isDark,
-                onTap: () {},
-              ),
-              const SizedBox(height: 12),
-              _buildSettingItem(
-                context: context,
-                icon: Icons.privacy_tip_outlined,
-                title: languageProvider.tr('privacyPolicy'),
-                isDark: isDark,
-                onTap: () {},
-              ),
-              const SizedBox(height: 12),
-              _buildSettingItem(
-                context: context,
-                icon: Icons.description_outlined,
-                title: languageProvider.tr('termsOfService'),
-                isDark: isDark,
-                onTap: () {},
-              ),
-              const SizedBox(height: 32),
-              _buildVersionInfo(languageProvider, isDark),
-            ],
-          ),
-        ),
+      backgroundColor: isDark ? AppColors.black : AppColors.white,
+      appBar: _buildAppBar(context, isDark, languageProvider),
+      floatingActionButton: _buildFab(context),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          const SizedBox(height: 16),
+          _buildLanguageOption(context, languageProvider, isDark),
+          const SizedBox(height: 12),
+          _buildThemeOption(context, themeProvider, languageProvider, isDark),
+          const SizedBox(height: 32),
+          _buildVersionInfo(languageProvider, isDark),
+        ],
       ),
     );
   }
 
-  PreferredSizeWidget _buildGlassmorphicAppBar(
+  Widget _buildFab(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: AppColors.primaryGradient,
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.mint.withValues(alpha: 0.4),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const AddSubscriptionScreen()),
+          );
+        },
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        child: const Icon(Icons.add, color: Colors.white),
+      ),
+    );
+  }
+
+  PreferredSizeWidget _buildAppBar(
     BuildContext context,
     bool isDark,
     LanguageProvider languageProvider,
   ) {
     return AppBar(
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-      flexibleSpace: ClipRect(
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Container(
-            decoration: BoxDecoration(
-              color: isDark
-                  ? Colors.black.withOpacity(0.3)
-                  : Colors.white.withOpacity(0.3),
-              border: Border(
-                bottom: BorderSide(
-                  color: Colors.white.withOpacity(0.1),
-                  width: 1,
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
+      backgroundColor: isDark ? AppColors.black : AppColors.white,
+      surfaceTintColor: Colors.transparent,
       leading: IconButton(
-        icon: const Icon(Icons.close),
+        icon: Icon(
+          Icons.arrow_back_ios_new_rounded,
+          color: isDark ? AppColors.white : AppColors.black,
+          size: 20,
+        ),
         onPressed: () => Navigator.pop(context),
       ),
       title: Text(
         languageProvider.tr('settings'),
         style: TextStyle(
+          fontSize: 18,
           fontWeight: FontWeight.w600,
-          letterSpacing: 0.5,
-          color: Theme.of(context).colorScheme.onSurface,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSectionTitle(String title, bool isDark) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 8),
-      child: Text(
-        title,
-        style: TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
-          letterSpacing: 1.2,
+          color: isDark ? AppColors.white : AppColors.black,
+          letterSpacing: -0.3,
         ),
       ),
     );
@@ -151,61 +94,53 @@ class _SettingsScreenState extends State<SettingsScreen>
     LanguageProvider languageProvider,
     bool isDark,
   ) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(20),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: Container(
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.darkSurfaceContainer : AppColors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: isDark
+              ? AppColors.darkOutline
+              : AppColors.mediumGray,
+          width: 1,
+        ),
+      ),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        leading: Container(
+          width: 40,
+          height: 40,
           decoration: BoxDecoration(
-            color: isDark
-                ? Colors.white.withOpacity(0.05)
-                : Colors.white.withOpacity(0.7),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: Colors.white.withOpacity(isDark ? 0.1 : 0.3),
-              width: 1.5,
-            ),
+            color: (isDark ? AppColors.white : AppColors.black)
+                .withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(10),
           ),
-          child: ListTile(
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 20,
-              vertical: 8,
-            ),
-            leading: Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: isDark
-                      ? [AppColors.darkPrimary.withOpacity(0.3), AppColors.secondary.withOpacity(0.3)]
-                      : [AppColors.primary.withOpacity(0.2), AppColors.secondary.withOpacity(0.2)],
-                ),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(
-                isDark ? Icons.dark_mode : Icons.light_mode,
-                color: isDark ? AppColors.darkPrimary : AppColors.primary,
-              ),
-            ),
-            title: Text(
-              languageProvider.tr('theme'),
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-            ),
-            subtitle: Text(
-              isDark ? languageProvider.tr('darkMode') : languageProvider.tr('lightMode'),
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-              ),
-            ),
-            trailing: Switch(
-              value: themeProvider.isDarkMode,
-              onChanged: (value) => themeProvider.toggleTheme(),
-              activeColor: AppColors.primary,
-            ),
+          child: Icon(
+            isDark ? Icons.dark_mode_outlined : Icons.light_mode_outlined,
+            color: isDark ? AppColors.white : AppColors.black,
+            size: 22,
           ),
+        ),
+        title: Text(
+          languageProvider.tr('theme'),
+          style: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+            color: isDark ? AppColors.white : AppColors.black,
+          ),
+        ),
+        subtitle: Text(
+          isDark ? languageProvider.tr('darkMode') : languageProvider.tr('lightMode'),
+          style: TextStyle(
+            fontSize: 13,
+            color: isDark ? AppColors.gray : AppColors.gray,
+          ),
+        ),
+        trailing: Switch(
+          value: themeProvider.isDarkMode,
+          onChanged: (value) => themeProvider.toggleTheme(),
+          activeThumbColor: AppColors.mint,
+          activeTrackColor: AppColors.mintLight,
         ),
       ),
     );
@@ -216,62 +151,53 @@ class _SettingsScreenState extends State<SettingsScreen>
     LanguageProvider languageProvider,
     bool isDark,
   ) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(20),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: Container(
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.darkSurfaceContainer : AppColors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: isDark
+              ? AppColors.darkOutline
+              : AppColors.mediumGray,
+          width: 1,
+        ),
+      ),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        leading: Container(
+          width: 40,
+          height: 40,
           decoration: BoxDecoration(
-            color: isDark
-                ? Colors.white.withOpacity(0.05)
-                : Colors.white.withOpacity(0.7),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: Colors.white.withOpacity(isDark ? 0.1 : 0.3),
-              width: 1.5,
-            ),
+            color: (isDark ? AppColors.white : AppColors.black)
+                .withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(10),
           ),
-          child: ListTile(
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 20,
-              vertical: 8,
-            ),
-            leading: Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: isDark
-                      ? [AppColors.darkTertiary.withOpacity(0.3), AppColors.accent.withOpacity(0.3)]
-                      : [AppColors.accent.withOpacity(0.2), AppColors.darkTertiary.withOpacity(0.2)],
-                ),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(
-                Icons.language,
-                color: isDark ? AppColors.darkTertiary : AppColors.accent,
-              ),
-            ),
-            title: Text(
-              languageProvider.tr('language'),
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-            ),
-            subtitle: Text(
-              languageProvider.isKorean ? '한국어' : 'English',
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-              ),
-            ),
-            trailing: Icon(
-              Icons.chevron_right,
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
-            ),
-            onTap: () => _showLanguageDialog(context, languageProvider, isDark),
+          child: Icon(
+            Icons.language_rounded,
+            color: isDark ? AppColors.white : AppColors.black,
+            size: 22,
           ),
         ),
+        title: Text(
+          languageProvider.tr('language'),
+          style: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+            color: isDark ? AppColors.white : AppColors.black,
+          ),
+        ),
+        subtitle: Text(
+          languageProvider.isKorean ? '한국어' : 'English',
+          style: TextStyle(
+            fontSize: 13,
+            color: isDark ? AppColors.gray : AppColors.gray,
+          ),
+        ),
+        trailing: Icon(
+          Icons.chevron_right_rounded,
+          color: isDark ? AppColors.gray : AppColors.gray,
+        ),
+        onTap: () => _showLanguageDialog(context, languageProvider, isDark),
       ),
     );
   }
@@ -284,80 +210,55 @@ class _SettingsScreenState extends State<SettingsScreen>
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
-      barrierColor: Colors.black.withOpacity(0.5),
-      builder: (context) => BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: ClipRRect(
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: isDark
-                    ? [
-                        Colors.black.withOpacity(0.8),
-                        Colors.black.withOpacity(0.7),
-                      ]
-                    : [
-                        Colors.white.withOpacity(0.95),
-                        Colors.white.withOpacity(0.9),
-                      ],
-              ),
-              border: Border(
-                top: BorderSide(
-                  color: Colors.white.withOpacity(isDark ? 0.1 : 0.3),
-                  width: 2,
-                ),
+      builder: (context) => Container(
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.black : AppColors.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: isDark ? AppColors.darkOutline : AppColors.mediumGray,
+                borderRadius: BorderRadius.circular(2),
               ),
             ),
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                Text(
-                  languageProvider.tr('language'),
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-                ),
-                const SizedBox(height: 24),
-                _buildLanguageItem(
-                  context: context,
-                  title: '한국어',
-                  isSelected: languageProvider.isKorean,
-                  isDark: isDark,
-                  onTap: () {
-                    languageProvider.setLanguage(AppStrings.korean);
-                    Navigator.pop(context);
-                  },
-                ),
-                const SizedBox(height: 12),
-                _buildLanguageItem(
-                  context: context,
-                  title: 'English',
-                  isSelected: languageProvider.isEnglish,
-                  isDark: isDark,
-                  onTap: () {
-                    languageProvider.setLanguage(AppStrings.english);
-                    Navigator.pop(context);
-                  },
-                ),
-                const SizedBox(height: 16),
-              ],
+            const SizedBox(height: 24),
+            Text(
+              languageProvider.tr('language'),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: isDark ? AppColors.white : AppColors.black,
+              ),
             ),
-          ),
+            const SizedBox(height: 20),
+            _buildLanguageItem(
+              context: context,
+              title: '한국어',
+              isSelected: languageProvider.isKorean,
+              isDark: isDark,
+              onTap: () {
+                languageProvider.setLanguage(AppStrings.korean);
+                Navigator.pop(context);
+              },
+            ),
+            const SizedBox(height: 10),
+            _buildLanguageItem(
+              context: context,
+              title: 'English',
+              isSelected: languageProvider.isEnglish,
+              isDark: isDark,
+              onTap: () {
+                languageProvider.setLanguage(AppStrings.english);
+                Navigator.pop(context);
+              },
+            ),
+          ],
         ),
       ),
     );
@@ -370,100 +271,44 @@ class _SettingsScreenState extends State<SettingsScreen>
     required bool isDark,
     required VoidCallback onTap,
   }) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-        child: Container(
-          decoration: BoxDecoration(
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? (isDark ? AppColors.white : AppColors.black)
+              : (isDark ? AppColors.darkSurfaceContainer : AppColors.white),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
             color: isSelected
-                ? (isDark
-                    ? AppColors.darkPrimary.withOpacity(0.2)
-                    : AppColors.primary.withOpacity(0.15))
+                ? Colors.transparent
                 : (isDark
-                    ? Colors.white.withOpacity(0.05)
-                    : Colors.white.withOpacity(0.5)),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: isSelected
-                  ? (isDark ? AppColors.darkPrimary : AppColors.primary)
-                  : Colors.white.withOpacity(isDark ? 0.1 : 0.3),
-              width: isSelected ? 2 : 1,
-            ),
-          ),
-          child: ListTile(
-            title: Text(
-              title,
-              style: TextStyle(
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-            ),
-            trailing: isSelected
-                ? Icon(
-                    Icons.check_circle,
-                    color: isDark ? AppColors.darkPrimary : AppColors.primary,
-                  )
-                : null,
-            onTap: onTap,
+                    ? AppColors.darkOutline
+                    : AppColors.mediumGray),
+            width: 1,
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildSettingItem({
-    required BuildContext context,
-    required IconData icon,
-    required String title,
-    required bool isDark,
-    required VoidCallback onTap,
-  }) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(20),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: Container(
-          decoration: BoxDecoration(
-            color: isDark
-                ? Colors.white.withOpacity(0.05)
-                : Colors.white.withOpacity(0.7),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: Colors.white.withOpacity(isDark ? 0.1 : 0.3),
-              width: 1.5,
-            ),
-          ),
-          child: ListTile(
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 20,
-              vertical: 4,
-            ),
-            leading: Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(
-                icon,
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-              ),
-            ),
-            title: Text(
+        child: Row(
+          children: [
+            Text(
               title,
               style: TextStyle(
-                fontWeight: FontWeight.w500,
-                color: Theme.of(context).colorScheme.onSurface,
+                fontSize: 16,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                color: isSelected
+                    ? (isDark ? AppColors.black : AppColors.white)
+                    : (isDark ? AppColors.white : AppColors.black),
               ),
             ),
-            trailing: Icon(
-              Icons.chevron_right,
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
-            ),
-            onTap: onTap,
-          ),
+            const Spacer(),
+            if (isSelected)
+              Icon(
+                Icons.check_rounded,
+                color: isDark ? AppColors.black : AppColors.white,
+                size: 22,
+              ),
+          ],
         ),
       ),
     );
@@ -474,8 +319,8 @@ class _SettingsScreenState extends State<SettingsScreen>
       child: Text(
         '${languageProvider.tr('version')} 1.0.0',
         style: TextStyle(
-          fontSize: 14,
-          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+          fontSize: 13,
+          color: AppColors.gray.withValues(alpha: 0.6),
         ),
       ),
     );
