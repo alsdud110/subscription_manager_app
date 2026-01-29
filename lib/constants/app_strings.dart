@@ -10,15 +10,15 @@ class AppStrings {
 
   static String get(String key, String languageCode) {
     return _localizedStrings[languageCode]?[key] ??
-           _localizedStrings[korean]?[key] ??
-           key;
+        _localizedStrings[korean]?[key] ??
+        key;
   }
 
   // Korean strings (default)
   static const Map<String, String> _koreanStrings = {
     // App
-    'appTitle': 'SubTrackr',
-    'subscriptionManager': 'SubTrackr',
+    'appTitle': '구독 관리',
+    'subscriptionManager': '구독 관리',
 
     // Home Screen
     'noSubscriptions': '구독 없음',
@@ -124,8 +124,8 @@ class AppStrings {
   // English strings
   static const Map<String, String> _englishStrings = {
     // App
-    'appTitle': 'SubTrackr',
-    'subscriptionManager': 'SubTrackr',
+    'appTitle': 'Subscription Manager',
+    'subscriptionManager': 'Subscription Manager',
 
     // Home Screen
     'noSubscriptions': 'No subscriptions',

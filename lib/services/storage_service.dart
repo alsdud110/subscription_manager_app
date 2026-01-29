@@ -18,7 +18,7 @@ class StorageService {
   Future<List<Subscription>> loadSubscriptions() async {
     final prefs = await SharedPreferences.getInstance();
     final jsonString = prefs.getString(_subscriptionsKey);
-    
+
     if (jsonString == null || jsonString.isEmpty) {
       return [];
     }
@@ -69,6 +69,7 @@ class StorageService {
 
   Future<double> loadExchangeRate() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getDouble(_exchangeRateKey) ?? 1350.0; // Default: 1 USD = 1350 KRW
+    return prefs.getDouble(_exchangeRateKey) ??
+        1450.0; // Default: 1 USD = 1450 KRW
   }
 }

@@ -4,7 +4,7 @@ import '../services/storage_service.dart';
 
 class CurrencyProvider extends ChangeNotifier {
   Currency _baseCurrency = Currency.krw; // Default to KRW
-  double _exchangeRate = 1350.0; // Default: 1 USD = 1350 KRW
+  double _exchangeRate = 1450.0; // Default: 1 USD = 1450 KRW
   final StorageService _storageService = StorageService();
 
   Currency get baseCurrency => _baseCurrency;
