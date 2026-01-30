@@ -22,15 +22,22 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
   final _serviceNameController = TextEditingController();
   final _amountController = TextEditingController();
 
+  // 스크롤 컨트롤러
+  final ScrollController _dayScrollController = ScrollController();
+  final ScrollController _weekdayScrollController = ScrollController();
+  final ScrollController _monthScrollController = ScrollController();
+
   late int _selectedColorValue;
   Currency _currency = Currency.krw;
   BillingCycle _billingCycle = BillingCycle.monthly;
-  int _dayOfWeek = 1;
-  int _dayOfMonth = 1;
-  int _month = 1;
+  late int _dayOfWeek;
+  late int _dayOfMonth;
+  late int _month;
   DateTime _startDate = DateTime.now();
   DateTime? _endDate;
   bool _hasEndDate = false;
+
+  bool _initialScrollDone = false;
 
   @override
   void initState() {
@@ -41,13 +48,98 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
     } else {
       _selectedColorValue = AppColors.subscriptionColors[0];
     }
+    // 결제 시작일에 맞춰 결제 주기 옵션 초기화
+    _updateBillingOptionsFromDate(_startDate);
+  }
+
+  void _updateBillingOptionsFromDate(DateTime date) {
+    _dayOfMonth = date.day;
+    _month = date.month;
+    _dayOfWeek = date.weekday; // 1=월요일, 7=일요일
+  }
+
+  void _onStartDateChanged(DateTime date) {
+    setState(() {
+      _startDate = date;
+      _updateBillingOptionsFromDate(date);
+    });
+    _scrollToSelectedDay();
+    _scrollToSelectedWeekday();
+    _scrollToSelectedMonth();
+  }
+
+  void _onBillingCycleChanged(BillingCycle cycle) {
+    setState(() => _billingCycle = cycle);
+    // 결제 주기에 따라 해당 스크롤러로 스크롤
+    switch (cycle) {
+      case BillingCycle.weekly:
+        _scrollToSelectedWeekday();
+        break;
+      case BillingCycle.monthly:
+        _scrollToSelectedDay();
+        break;
+      case BillingCycle.yearly:
+      case BillingCycle.once:
+        _scrollToSelectedMonth();
+        _scrollToSelectedDay();
+        break;
+    }
   }
 
   @override
   void dispose() {
     _serviceNameController.dispose();
     _amountController.dispose();
+    _dayScrollController.dispose();
+    _weekdayScrollController.dispose();
+    _monthScrollController.dispose();
     super.dispose();
+  }
+
+  // 선택된 항목으로 스크롤 애니메이션
+  void _scrollToSelectedDay() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_dayScrollController.hasClients) {
+        final itemWidth = 54.0; // 46 + 8 margin
+        final screenWidth = MediaQuery.of(context).size.width;
+        final targetOffset = ((_dayOfMonth - 1) * itemWidth) - (screenWidth / 2) + (itemWidth / 2) + 4;
+        _dayScrollController.animateTo(
+          targetOffset.clamp(0.0, _dayScrollController.position.maxScrollExtent),
+          duration: const Duration(milliseconds: 400),
+          curve: Curves.easeOutCubic,
+        );
+      }
+    });
+  }
+
+  void _scrollToSelectedWeekday() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_weekdayScrollController.hasClients) {
+        final itemWidth = 70.0; // 요일 아이템 평균 너비
+        final screenWidth = MediaQuery.of(context).size.width;
+        final targetOffset = ((_dayOfWeek - 1) * itemWidth) - (screenWidth / 2) + (itemWidth / 2) + 4;
+        _weekdayScrollController.animateTo(
+          targetOffset.clamp(0.0, _weekdayScrollController.position.maxScrollExtent),
+          duration: const Duration(milliseconds: 400),
+          curve: Curves.easeOutCubic,
+        );
+      }
+    });
+  }
+
+  void _scrollToSelectedMonth() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_monthScrollController.hasClients) {
+        final itemWidth = 70.0; // 월 아이템 평균 너비
+        final screenWidth = MediaQuery.of(context).size.width;
+        final targetOffset = ((_month - 1) * itemWidth) - (screenWidth / 2) + (itemWidth / 2) + 4;
+        _monthScrollController.animateTo(
+          targetOffset.clamp(0.0, _monthScrollController.position.maxScrollExtent),
+          duration: const Duration(milliseconds: 400),
+          curve: Curves.easeOutCubic,
+        );
+      }
+    });
   }
 
   @override
@@ -85,7 +177,7 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
               isDark,
               languageProvider,
               _startDate,
-              (date) => setState(() => _startDate = date),
+              _onStartDateChanged,
             ),
             const SizedBox(height: 24),
             _buildEndDateSection(isDark, languageProvider),
@@ -631,7 +723,7 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
       children: cycles.map((cycle) {
         final isSelected = _billingCycle == cycle.$1;
         return GestureDetector(
-          onTap: () => setState(() => _billingCycle = cycle.$1),
+          onTap: () => _onBillingCycleChanged(cycle.$1),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             decoration: BoxDecoration(
@@ -715,6 +807,13 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
       (12, languageProvider.tr('december')),
     ];
 
+    // 초기 스크롤 위치 설정
+    if (!_initialScrollDone) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scrollToSelectedMonth();
+      });
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -723,6 +822,7 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
         SizedBox(
           height: 54, // 다른 선택기들과 높이 통일
           child: ListView.builder(
+            controller: _monthScrollController,
             scrollDirection: Axis.horizontal,
             itemCount: months.length,
             padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -811,12 +911,20 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
       (7, languageProvider.tr('sunday')),
     ];
 
+    // 초기 스크롤 위치 설정
+    if (!_initialScrollDone) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scrollToSelectedWeekday();
+      });
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(
           height: 54, // 날짜 선택기와 높이 통일
           child: ListView.builder(
+            controller: _weekdayScrollController,
             scrollDirection: Axis.horizontal,
             itemCount: weekdays.length,
             padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -909,12 +1017,21 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
   }
 
   Widget _buildDayGrid(bool isDark, LanguageProvider languageProvider) {
+    // 초기 스크롤 위치 설정
+    if (!_initialScrollDone) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scrollToSelectedDay();
+        _initialScrollDone = true;
+      });
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(
           height: 54, // 피커 높이
           child: ListView.builder(
+            controller: _dayScrollController,
             scrollDirection: Axis.horizontal,
             itemCount: 31,
             padding: const EdgeInsets.symmetric(horizontal: 4),
