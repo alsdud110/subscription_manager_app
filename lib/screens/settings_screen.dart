@@ -21,132 +21,95 @@ class SettingsScreen extends StatelessWidget {
     final isDark = themeProvider.isDarkMode;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.black : AppColors.white,
+      backgroundColor: isDark ? AppColors.black : AppColors.lightGray,
       appBar: _buildAppBar(context, isDark, languageProvider),
       body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
         children: [
+          // 앱 설정 섹션
           _buildSectionHeader(languageProvider.tr('appSettings'), isDark),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
           _buildSettingsCard(
             isDark: isDark,
             children: [
-              _buildCompactListTile(
+              _buildSettingsTile(
                 icon: Icons.language_rounded,
+                iconBgColor: AppColors.purple,
                 title: languageProvider.tr('language'),
-                subtitle: languageProvider
+                value: languageProvider
                     .tr(languageProvider.isKorean ? 'korean' : 'english'),
                 isDark: isDark,
                 onTap: () =>
                     _showLanguageDialog(context, languageProvider, isDark),
               ),
-              _buildDivider(isDark),
-              _buildCompactListTile(
-                icon: isDark ? Icons.dark_mode_outlined : Icons.light_mode_outlined,
+              _buildSettingsTile(
+                icon:
+                    isDark ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
+                iconBgColor: isDark ? AppColors.purpleLight : AppColors.mint,
                 title: languageProvider.tr('theme'),
-                subtitle: isDark
-                    ? languageProvider.tr('darkMode')
-                    : languageProvider.tr('lightMode'),
                 isDark: isDark,
-                trailing: Transform.scale(
-                  scale: 0.8,
-                  child: Switch(
-                    value: themeProvider.isDarkMode,
-                    onChanged: (value) => themeProvider.toggleTheme(),
-                    activeThumbColor: AppColors.mint,
-                    activeTrackColor: AppColors.mintLight,
-                  ),
-                ),
+                trailing: _buildThemeToggle(themeProvider, isDark),
               ),
-              _buildDivider(isDark),
-              _buildCompactListTile(
-                icon: Icons.attach_money_rounded,
+            ],
+          ),
+          const SizedBox(height: 16),
+
+          // 통화 설정 섹션
+          _buildSectionHeader(languageProvider.tr('currency'), isDark),
+          const SizedBox(height: 10),
+          _buildSettingsCard(
+            isDark: isDark,
+            children: [
+              _buildSettingsTile(
+                icon: Icons.paid_rounded,
+                iconBgColor: AppColors.teal,
                 title: languageProvider.tr('baseCurrency'),
-                subtitle: currencyProvider.isKrwBase
-                    ? languageProvider.tr('krwFull')
-                    : languageProvider.tr('usdFull'),
+                value: currencyProvider.isKrwBase ? 'KRW' : 'USD',
                 isDark: isDark,
                 onTap: () => _showBaseCurrencyDialog(
                     context, currencyProvider, languageProvider, isDark),
               ),
-              _buildDivider(isDark),
-              _buildCompactListTile(
-                icon: Icons.currency_exchange_rounded,
+              _buildSettingsTile(
+                icon: Icons.swap_horiz_rounded,
+                iconBgColor: AppColors.mint,
                 title: languageProvider.tr('exchangeRate'),
-                subtitle:
-                    '1 USD = ${currencyProvider.exchangeRate.toStringAsFixed(0)} KRW',
+                value:
+                    '${currencyProvider.exchangeRate.toStringAsFixed(0)} KRW',
                 isDark: isDark,
+                showBorder: false,
                 onTap: () => _showExchangeRateDialog(
                     context, currencyProvider, languageProvider, isDark),
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
+
+          // 데이터 관리 섹션
           _buildSectionHeader(languageProvider.tr('dataManagement'), isDark),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
           _buildSettingsCard(
             isDark: isDark,
             children: [
-              _buildCompactListTile(
-                icon: Icons.delete_outline_rounded,
+              _buildSettingsTile(
+                icon: Icons.delete_sweep_rounded,
+                iconBgColor: const Color(0xFFFF6B6B),
                 title: languageProvider.tr('resetAllSubscriptions'),
-                subtitle: subscriptionProvider.subscriptionCount > 0
+                value: subscriptionProvider.subscriptionCount > 0
                     ? '${subscriptionProvider.subscriptionCount}${languageProvider.tr('registeredSubscriptions')}'
-                    : languageProvider.tr('noSubscriptionsToReset'),
+                    : null,
                 isDark: isDark,
-                iconColor: Colors.red,
+                showBorder: false,
+                valueColor: AppColors.gray,
                 onTap: () => _showResetConfirmDialog(
                     context, subscriptionProvider, languageProvider, isDark),
               ),
             ],
           ),
-          const SizedBox(height: 20),
-          _buildSectionHeader(languageProvider.tr('appInfo'), isDark),
-          const SizedBox(height: 8),
-          _buildSettingsCard(
-            isDark: isDark,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(12),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Icon(
-                      Icons.info_outline_rounded,
-                      size: 16,
-                      color: AppColors.gray,
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            languageProvider.tr('fontLicense'),
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                              color: isDark ? AppColors.white : AppColors.black,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            languageProvider.tr('fontLicenseText'),
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: AppColors.gray,
-                              height: 1.4,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
+
+          // 앱 정보 섹션
+          // _buildSectionHeader(languageProvider.tr('appInfo'), isDark),
+          const SizedBox(height: 10),
         ],
       ),
     );
@@ -154,13 +117,14 @@ class SettingsScreen extends StatelessWidget {
 
   Widget _buildSectionHeader(String title, bool isDark) {
     return Padding(
-      padding: const EdgeInsets.only(left: 4, top: 8),
+      padding: const EdgeInsets.only(left: 4, top: 8, bottom: 2),
       child: Text(
-        title,
-        style: const TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-          color: AppColors.gray,
+        title.toUpperCase(),
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+          color: isDark ? AppColors.gray : AppColors.stone,
+          letterSpacing: 0.8,
         ),
       ),
     );
@@ -173,91 +137,240 @@ class SettingsScreen extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: isDark ? AppColors.darkSurfaceContainer : AppColors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: isDark ? AppColors.darkOutline : AppColors.mediumGray,
-          width: 1,
-        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: isDark
+            ? null
+            : [
+                BoxShadow(
+                  color: AppColors.black.withValues(alpha: 0.04),
+                  blurRadius: 10,
+                  offset: const Offset(0, 2),
+                ),
+              ],
       ),
-      child: Column(
-        children: children,
-      ),
+      child: Column(children: children),
     );
   }
 
-  Widget _buildDivider(bool isDark) {
-    return Divider(
-      height: 1,
-      thickness: 1,
-      indent: 44,
-      color: isDark ? AppColors.darkOutline : AppColors.mediumGray,
-    );
-  }
-
-  Widget _buildCompactListTile({
+  Widget _buildSettingsTile({
     required IconData icon,
+    required Color iconBgColor,
     required String title,
-    required String subtitle,
+    String? value,
     required bool isDark,
     Widget? trailing,
+    bool showBorder = true,
+    Color? valueColor,
     VoidCallback? onTap,
-    Color? iconColor,
   }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        child: Row(
-          children: [
-            Container(
-              width: 28,
-              height: 28,
-              decoration: BoxDecoration(
-                color: (iconColor ?? (isDark ? AppColors.white : AppColors.black))
-                    .withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(7),
-              ),
-              child: Icon(
-                icon,
-                color: iconColor ?? (isDark ? AppColors.white : AppColors.black),
-                size: 16,
-              ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: isDark ? AppColors.white : AppColors.black,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            border: showBorder
+                ? Border(
+                    bottom: BorderSide(
+                      color: isDark
+                          ? AppColors.darkOutline.withValues(alpha: 0.5)
+                          : AppColors.lightGray,
+                      width: 1,
                     ),
+                  )
+                : null,
+          ),
+          child: Row(
+            children: [
+              // 아이콘
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      iconBgColor,
+                      iconBgColor.withValues(alpha: 0.7),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
                   ),
-                  const SizedBox(height: 1),
-                  Text(
-                    subtitle,
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: AppColors.gray,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: iconBgColor.withValues(alpha: 0.3),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
                     ),
-                  ),
-                ],
+                  ],
+                ),
+                child: Icon(icon, color: AppColors.white, size: 18),
               ),
-            ),
-            trailing ??
-                (onTap != null
-                    ? Icon(
-                        Icons.chevron_right_rounded,
-                        color: AppColors.gray,
-                        size: 18,
-                      )
-                    : const SizedBox.shrink()),
-          ],
+              const SizedBox(width: 14),
+              // 타이틀
+              Expanded(
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
+                    color: isDark ? AppColors.white : AppColors.black,
+                  ),
+                ),
+              ),
+              // 값 또는 trailing 위젯
+              if (trailing != null)
+                trailing
+              else if (value != null) ...[
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: valueColor ??
+                        (isDark ? AppColors.mint : AppColors.teal),
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Icon(
+                  Icons.chevron_right_rounded,
+                  color: isDark ? AppColors.gray : AppColors.stone,
+                  size: 20,
+                ),
+              ] else if (onTap != null)
+                Icon(
+                  Icons.chevron_right_rounded,
+                  color: isDark ? AppColors.gray : AppColors.stone,
+                  size: 20,
+                ),
+            ],
+          ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildThemeToggle(ThemeProvider themeProvider, bool isDark) {
+    return GestureDetector(
+      onTap: () => themeProvider.toggleTheme(),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        width: 52,
+        height: 28,
+        padding: const EdgeInsets.all(3),
+        decoration: BoxDecoration(
+          gradient: isDark
+              ? const LinearGradient(
+                  colors: [AppColors.purple, AppColors.purpleLight],
+                )
+              : const LinearGradient(
+                  colors: [AppColors.mint, AppColors.teal],
+                ),
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: AnimatedAlign(
+          duration: const Duration(milliseconds: 200),
+          alignment: isDark ? Alignment.centerRight : Alignment.centerLeft,
+          child: Container(
+            width: 22,
+            height: 22,
+            decoration: BoxDecoration(
+              color: AppColors.white,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.black.withValues(alpha: 0.15),
+                  blurRadius: 4,
+                  offset: const Offset(0, 1),
+                ),
+              ],
+            ),
+            child: Icon(
+              isDark ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
+              size: 14,
+              color: isDark ? AppColors.purple : AppColors.teal,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoCard({
+    required bool isDark,
+    required IconData icon,
+    required String title,
+    required String description,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: isDark
+            ? const LinearGradient(
+                colors: [
+                  AppColors.darkSurfaceContainer,
+                  AppColors.darkOutlineVariant,
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              )
+            : LinearGradient(
+                colors: [
+                  AppColors.white,
+                  AppColors.lightGray.withValues(alpha: 0.5),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isDark
+              ? AppColors.darkOutline.withValues(alpha: 0.3)
+              : AppColors.mediumGray.withValues(alpha: 0.3),
+        ),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              color: isDark
+                  ? AppColors.gray.withValues(alpha: 0.2)
+                  : AppColors.lightGray,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, size: 16, color: AppColors.gray),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: isDark ? AppColors.white : AppColors.black,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  description,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: AppColors.gray,
+                    height: 1.5,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -268,22 +381,30 @@ class SettingsScreen extends StatelessWidget {
     LanguageProvider languageProvider,
   ) {
     return AppBar(
-      backgroundColor: isDark ? AppColors.black : AppColors.white,
+      backgroundColor: isDark ? AppColors.black : AppColors.lightGray,
       surfaceTintColor: Colors.transparent,
-      toolbarHeight: 48,
+      elevation: 0,
       leading: IconButton(
-        icon: Icon(
-          Icons.arrow_back_ios_new_rounded,
-          color: isDark ? AppColors.white : AppColors.black,
-          size: 18,
+        icon: Container(
+          padding: const EdgeInsets.all(6),
+          decoration: BoxDecoration(
+            color: isDark ? AppColors.darkSurfaceContainer : AppColors.white,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: isDark ? AppColors.white : AppColors.black,
+            size: 16,
+          ),
         ),
         onPressed: () => Navigator.pop(context),
       ),
+      centerTitle: true,
       title: Text(
         languageProvider.tr('settings'),
         style: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
+          fontSize: 17,
+          fontWeight: FontWeight.w700,
           color: isDark ? AppColors.white : AppColors.black,
           letterSpacing: -0.3,
         ),
@@ -302,6 +423,10 @@ class SettingsScreen extends StatelessWidget {
         SnackBar(
           content: Text(languageProvider.tr('noSubscriptionsToReset')),
           behavior: SnackBarBehavior.floating,
+          backgroundColor:
+              isDark ? AppColors.darkSurfaceContainer : AppColors.black,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         ),
       );
       return;
@@ -312,40 +437,51 @@ class SettingsScreen extends StatelessWidget {
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
         decoration: BoxDecoration(
-          color: isDark ? AppColors.black : AppColors.white,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          color: isDark ? AppColors.darkSurfaceContainer : AppColors.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         ),
-        padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
+        padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 36,
+              width: 40,
               height: 4,
               decoration: BoxDecoration(
                 color: isDark ? AppColors.darkOutline : AppColors.mediumGray,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
             Container(
-              width: 48,
-              height: 48,
+              width: 56,
+              height: 56,
               decoration: BoxDecoration(
-                color: Colors.red.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
+                gradient: const LinearGradient(
+                  colors: [Color(0xFFFF6B6B), Color(0xFFFF8E53)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFFFF6B6B).withValues(alpha: 0.3),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
               child: const Icon(
                 Icons.warning_rounded,
-                color: Colors.red,
-                size: 24,
+                color: AppColors.white,
+                size: 28,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             Text(
               languageProvider.tr('resetConfirmTitle'),
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 18,
                 fontWeight: FontWeight.w700,
                 color: isDark ? AppColors.white : AppColors.black,
               ),
@@ -354,43 +490,30 @@ class SettingsScreen extends StatelessWidget {
             Text(
               languageProvider.tr('resetConfirmMessage'),
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 13,
+              style: const TextStyle(
+                fontSize: 14,
                 color: AppColors.gray,
-                height: 1.4,
+                height: 1.5,
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
             Row(
               children: [
                 Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => Navigator.pop(context),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor:
-                          isDark ? AppColors.white : AppColors.black,
-                      side: BorderSide(
-                        color:
-                            isDark ? AppColors.darkOutline : AppColors.mediumGray,
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    child: Text(
-                      languageProvider.tr('cancel'),
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+                  child: _buildBottomSheetButton(
+                    text: languageProvider.tr('cancel'),
+                    isDark: isDark,
+                    isDestructive: false,
+                    onTap: () => Navigator.pop(context),
                   ),
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 12),
                 Expanded(
-                  child: ElevatedButton(
-                    onPressed: () async {
+                  child: _buildBottomSheetButton(
+                    text: languageProvider.tr('reset'),
+                    isDark: isDark,
+                    isDestructive: true,
+                    onTap: () async {
                       await subscriptionProvider.clearAllSubscriptions();
                       if (context.mounted) {
                         Navigator.pop(context);
@@ -399,30 +522,59 @@ class SettingsScreen extends StatelessWidget {
                             content:
                                 Text(languageProvider.tr('subscriptionsReset')),
                             behavior: SnackBarBehavior.floating,
+                            backgroundColor: AppColors.teal,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10)),
                           ),
                         );
                       }
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      foregroundColor: AppColors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    child: Text(
-                      languageProvider.tr('reset'),
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
                   ),
                 ),
               ],
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBottomSheetButton({
+    required String text,
+    required bool isDark,
+    required bool isDestructive,
+    required VoidCallback onTap,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          decoration: BoxDecoration(
+            gradient: isDestructive
+                ? const LinearGradient(
+                    colors: [Color(0xFFFF6B6B), Color(0xFFFF8E53)],
+                  )
+                : null,
+            color: isDestructive
+                ? null
+                : (isDark ? AppColors.darkOutline : AppColors.lightGray),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Center(
+            child: Text(
+              text,
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                color: isDestructive
+                    ? AppColors.white
+                    : (isDark ? AppColors.white : AppColors.black),
+              ),
+            ),
+          ),
         ),
       ),
     );
@@ -438,34 +590,34 @@ class SettingsScreen extends StatelessWidget {
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
         decoration: BoxDecoration(
-          color: isDark ? AppColors.black : AppColors.white,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          color: isDark ? AppColors.darkSurfaceContainer : AppColors.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         ),
-        padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
+        padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 36,
+              width: 40,
               height: 4,
               decoration: BoxDecoration(
                 color: isDark ? AppColors.darkOutline : AppColors.mediumGray,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
             Text(
               languageProvider.tr('language'),
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 18,
                 fontWeight: FontWeight.w700,
                 color: isDark ? AppColors.white : AppColors.black,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             _buildSelectionItem(
-              context: context,
               title: '한국어',
+              subtitle: 'Korean',
               isSelected: languageProvider.isKorean,
               isDark: isDark,
               onTap: () {
@@ -473,10 +625,10 @@ class SettingsScreen extends StatelessWidget {
                 Navigator.pop(context);
               },
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 10),
             _buildSelectionItem(
-              context: context,
               title: 'English',
+              subtitle: '영어',
               isSelected: languageProvider.isEnglish,
               isDark: isDark,
               onTap: () {
@@ -501,34 +653,34 @@ class SettingsScreen extends StatelessWidget {
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
         decoration: BoxDecoration(
-          color: isDark ? AppColors.black : AppColors.white,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          color: isDark ? AppColors.darkSurfaceContainer : AppColors.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         ),
-        padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
+        padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 36,
+              width: 40,
               height: 4,
               decoration: BoxDecoration(
                 color: isDark ? AppColors.darkOutline : AppColors.mediumGray,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
             Text(
               languageProvider.tr('baseCurrency'),
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 18,
                 fontWeight: FontWeight.w700,
                 color: isDark ? AppColors.white : AppColors.black,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             _buildSelectionItem(
-              context: context,
-              title: languageProvider.tr('krwFull'),
+              title: '₩ KRW',
+              subtitle: languageProvider.tr('krwFull'),
               isSelected: currencyProvider.isKrwBase,
               isDark: isDark,
               onTap: () {
@@ -536,10 +688,10 @@ class SettingsScreen extends StatelessWidget {
                 Navigator.pop(context);
               },
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 10),
             _buildSelectionItem(
-              context: context,
-              title: languageProvider.tr('usdFull'),
+              title: '\$ USD',
+              subtitle: languageProvider.tr('usdFull'),
               isSelected: currencyProvider.isUsdBase,
               isDark: isDark,
               onTap: () {
@@ -573,61 +725,51 @@ class SettingsScreen extends StatelessWidget {
         ),
         child: Container(
           decoration: BoxDecoration(
-            color: isDark ? AppColors.black : AppColors.white,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+            color: isDark ? AppColors.darkSurfaceContainer : AppColors.white,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           ),
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
+          padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                width: 36,
+                width: 40,
                 height: 4,
                 decoration: BoxDecoration(
                   color: isDark ? AppColors.darkOutline : AppColors.mediumGray,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 24),
               Text(
                 languageProvider.tr('exchangeRate'),
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 18,
                   fontWeight: FontWeight.w700,
                   color: isDark ? AppColors.white : AppColors.black,
                 ),
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: 8),
               Text(
                 languageProvider.tr('exchangeRateDescription'),
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: AppColors.gray,
-                ),
+                style: const TextStyle(fontSize: 13, color: AppColors.gray),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 24),
               Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
-                  color: isDark
-                      ? AppColors.darkSurfaceContainer
-                      : AppColors.lightGray,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color:
-                        isDark ? AppColors.darkOutline : AppColors.mediumGray,
-                  ),
+                  color: isDark ? AppColors.darkOutline : AppColors.lightGray,
+                  borderRadius: BorderRadius.circular(14),
                 ),
                 child: Row(
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left: 14),
-                      child: Text(
-                        '1 USD =',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: isDark ? AppColors.white : AppColors.black,
-                        ),
+                    Text(
+                      '1 USD =',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: isDark ? AppColors.white : AppColors.black,
                       ),
                     ),
                     Expanded(
@@ -641,55 +783,67 @@ class SettingsScreen extends StatelessWidget {
                         ],
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: 24,
                           fontWeight: FontWeight.w700,
-                          color: isDark ? AppColors.white : AppColors.black,
+                          color: isDark ? AppColors.mint : AppColors.teal,
                         ),
                         decoration: const InputDecoration(
                           border: InputBorder.none,
                           contentPadding:
-                              EdgeInsets.symmetric(horizontal: 8, vertical: 14),
+                              EdgeInsets.symmetric(horizontal: 8, vertical: 12),
                         ),
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 14),
-                      child: Text(
-                        'KRW',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: isDark ? AppColors.white : AppColors.black,
-                        ),
+                    Text(
+                      'KRW',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: isDark ? AppColors.white : AppColors.black,
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 24),
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    final rate = double.tryParse(controller.text);
-                    if (rate != null && rate > 0) {
-                      currencyProvider.setExchangeRate(rate);
-                      Navigator.pop(context);
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: isDark ? AppColors.white : AppColors.black,
-                    foregroundColor: isDark ? AppColors.black : AppColors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  child: Text(
-                    languageProvider.tr('save'),
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () {
+                      final rate = double.tryParse(controller.text);
+                      if (rate != null && rate > 0) {
+                        currencyProvider.setExchangeRate(rate);
+                        Navigator.pop(context);
+                      }
+                    },
+                    borderRadius: BorderRadius.circular(14),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [AppColors.mint, AppColors.teal],
+                        ),
+                        borderRadius: BorderRadius.circular(14),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.mint.withValues(alpha: 0.3),
+                            blurRadius: 12,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Center(
+                        child: Text(
+                          languageProvider.tr('save'),
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.white,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -702,48 +856,87 @@ class SettingsScreen extends StatelessWidget {
   }
 
   Widget _buildSelectionItem({
-    required BuildContext context,
     required String title,
+    required String subtitle,
     required bool isSelected,
     required bool isDark,
     required VoidCallback onTap,
   }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? (isDark ? AppColors.white : AppColors.black)
-              : (isDark ? AppColors.darkSurfaceContainer : AppColors.white),
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(14),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          decoration: BoxDecoration(
+            gradient: isSelected
+                ? const LinearGradient(
+                    colors: [AppColors.mint, AppColors.teal],
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                  )
+                : null,
             color: isSelected
-                ? Colors.transparent
-                : (isDark ? AppColors.darkOutline : AppColors.mediumGray),
-            width: 1,
+                ? null
+                : (isDark ? AppColors.darkOutline : AppColors.lightGray),
+            borderRadius: BorderRadius.circular(14),
+            boxShadow: isSelected
+                ? [
+                    BoxShadow(
+                      color: AppColors.mint.withValues(alpha: 0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ]
+                : null,
           ),
-        ),
-        child: Row(
-          children: [
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                color: isSelected
-                    ? (isDark ? AppColors.black : AppColors.white)
-                    : (isDark ? AppColors.white : AppColors.black),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: isSelected
+                            ? AppColors.white
+                            : (isDark ? AppColors.white : AppColors.black),
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: isSelected
+                            ? AppColors.white.withValues(alpha: 0.8)
+                            : AppColors.gray,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const Spacer(),
-            if (isSelected)
-              Icon(
-                Icons.check_rounded,
-                color: isDark ? AppColors.black : AppColors.white,
-                size: 18,
-              ),
-          ],
+              if (isSelected)
+                Container(
+                  width: 24,
+                  height: 24,
+                  decoration: BoxDecoration(
+                    color: AppColors.white.withValues(alpha: 0.2),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.check_rounded,
+                    color: AppColors.white,
+                    size: 16,
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );
