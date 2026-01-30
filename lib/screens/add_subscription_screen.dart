@@ -1118,8 +1118,6 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
           return "매월 $_dayOfMonth일에 결제됩니다.";
         case BillingCycle.yearly:
           return "매년 $_month월 $_dayOfMonth일에 결제됩니다."; // '매년'으로 수정
-        default:
-          return "";
       }
     } else {
       // 영어 버전 대응
@@ -1132,8 +1130,6 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
           return "Billed on the ${_dayOfMonth}th of every month.";
         case BillingCycle.yearly:
           return "Billed on $_month/$_dayOfMonth every year.";
-        default:
-          return "";
       }
     }
   }
