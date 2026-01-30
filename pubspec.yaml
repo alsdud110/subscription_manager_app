@@ -42,4 +42,4 @@ flutter:
   fonts:
     - family: Jalnan2
       fonts:
-        - asset: assets/fonts/Hakgyoansim_JayusiganR.ttf
+        - asset: assets/fonts/BMJUA_ttf.ttf
