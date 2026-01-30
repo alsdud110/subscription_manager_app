@@ -16,6 +16,8 @@ class Subscription {
   final int? month;
   final DateTime createdAt;
   final int colorValue;
+  final DateTime? startDate;
+  final DateTime? endDate;
 
   Subscription({
     required this.id,
@@ -29,6 +31,8 @@ class Subscription {
     this.month,
     required this.createdAt,
     this.colorValue = 0xFF6C63FF,
+    this.startDate,
+    this.endDate,
   });
 
   Map<String, dynamic> toJson() {
@@ -44,6 +48,8 @@ class Subscription {
       'month': month,
       'createdAt': createdAt.toIso8601String(),
       'colorValue': colorValue,
+      'startDate': startDate?.toIso8601String(),
+      'endDate': endDate?.toIso8601String(),
     };
   }
 
@@ -60,6 +66,8 @@ class Subscription {
       month: json['month'],
       createdAt: DateTime.parse(json['createdAt']),
       colorValue: json['colorValue'] ?? 0xFF6C63FF,
+      startDate: json['startDate'] != null ? DateTime.parse(json['startDate']) : null,
+      endDate: json['endDate'] != null ? DateTime.parse(json['endDate']) : null,
     );
   }
 

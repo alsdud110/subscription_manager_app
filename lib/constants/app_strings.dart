@@ -101,6 +101,21 @@ class AppStrings {
 
     // Predefined Services
     'custom': '사용자 지정',
+    'customService': '직접 입력',
+    'customServiceDesc': '원하는 서비스를 직접 추가하세요',
+    'searchService': '서비스 검색',
+    'searchServiceHint': '서비스 이름을 검색하세요',
+    'noSearchResults': '검색 결과가 없습니다',
+    'selectServiceDesc': '구독 중인 서비스를 선택하세요',
+    'selectServicePlease': '서비스를 선택하세요',
+    'select': '선택',
+    'clear': '초기화',
+    'other': '기타',
+    'serviceName': '서비스 이름',
+    'enterServiceName': '서비스 이름을 입력하세요',
+    'startDate': '결제 시작일',
+    'endDate': '종료일',
+    'optional': '선택사항',
 
     // Billing Info
     'everyWeekOn': '매주',
@@ -214,6 +229,21 @@ class AppStrings {
 
     // Predefined Services
     'custom': 'Custom',
+    'customService': 'Custom Input',
+    'customServiceDesc': 'Add your own service',
+    'searchService': 'Search service',
+    'searchServiceHint': 'Search for a service',
+    'noSearchResults': 'No search results',
+    'selectServiceDesc': 'Select a service you subscribe to',
+    'selectServicePlease': 'Select a service',
+    'select': 'Select',
+    'clear': 'Clear',
+    'other': 'Other',
+    'serviceName': 'Service Name',
+    'enterServiceName': 'Enter service name',
+    'startDate': 'Start Date',
+    'endDate': 'End Date',
+    'optional': 'Optional',
 
     // Billing Info
     'everyWeekOn': 'Every week on',

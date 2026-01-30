@@ -8,7 +8,7 @@ import '../providers/subscription_provider.dart';
 import '../providers/language_provider.dart';
 import '../widgets/subscription_bottom_sheet.dart';
 import '../widgets/summary_cards.dart';
-import 'add_subscription_screen.dart';
+import 'select_service_screen.dart';
 import 'settings_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -128,7 +128,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => const AddSubscriptionScreen()),
+                builder: (context) => const SelectServiceScreen()),
           );
         },
         backgroundColor: Colors.transparent,
