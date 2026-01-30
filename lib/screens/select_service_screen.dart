@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../constants/colors.dart';
 import '../constants/services.dart';
 import '../providers/language_provider.dart';
+import '../utils/page_transitions.dart';
 import 'add_subscription_screen.dart';
 
 class SelectServiceScreen extends StatefulWidget {
@@ -37,7 +38,36 @@ class _SelectServiceScreenState extends State<SelectServiceScreen> {
 
     return Scaffold(
       backgroundColor: isDark ? AppColors.black : AppColors.white,
+      appBar: AppBar(
+        backgroundColor: isDark ? AppColors.black : AppColors.white,
+        surfaceTintColor: Colors.transparent,
+        centerTitle: true,
+        title: Text(
+          languageProvider.tr('selectService'),
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: isDark ? AppColors.white : AppColors.black,
+          ),
+        ),
+        leading: IconButton(
+          onPressed: () => Navigator.pop(context),
+          icon: Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: isDark ? AppColors.darkSurfaceContainer : AppColors.lightGray,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(
+              Icons.arrow_back_ios_new_rounded,
+              color: isDark ? AppColors.white : AppColors.black,
+              size: 16,
+            ),
+          ),
+        ),
+      ),
       body: SafeArea(
+        top: false,
         child: Column(
           children: [
             Expanded(
@@ -46,8 +76,6 @@ class _SelectServiceScreenState extends State<SelectServiceScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildHeader(context, isDark, languageProvider),
-                    const SizedBox(height: 20),
                     _buildSearchBar(isDark, languageProvider),
                     const SizedBox(height: 24),
                     ..._buildCategorySections(isDark, languageProvider),
@@ -59,35 +87,6 @@ class _SelectServiceScreenState extends State<SelectServiceScreen> {
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildHeader(
-    BuildContext context,
-    bool isDark,
-    LanguageProvider languageProvider,
-  ) {
-    return Row(
-      children: [
-        Expanded(
-          child: Text(
-            languageProvider.tr('selectService'),
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: isDark ? AppColors.white : AppColors.black,
-              letterSpacing: -0.5,
-            ),
-          ),
-        ),
-        IconButton(
-          onPressed: () => Navigator.pop(context),
-          icon: Icon(
-            Icons.close_rounded,
-            color: isDark ? AppColors.gray : AppColors.darkGray,
-          ),
-        ),
-      ],
     );
   }
 
@@ -389,9 +388,7 @@ class _SelectServiceScreenState extends State<SelectServiceScreen> {
   void _navigateToAddSubscription(ServiceInfo? service) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => AddSubscriptionScreen(selectedService: service),
-      ),
+      FadeSlidePageRoute(page: AddSubscriptionScreen(selectedService: service)),
     );
   }
 }

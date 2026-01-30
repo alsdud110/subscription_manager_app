@@ -7,6 +7,7 @@ import 'providers/language_provider.dart';
 import 'providers/currency_provider.dart';
 import 'screens/splash_screen.dart';
 import 'screens/home_screen.dart';
+import 'utils/page_transitions.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -43,11 +44,19 @@ class MyApp extends StatelessWidget {
             title: 'Subscription Manager',
             debugShowCheckedModeBanner: false,
             theme: themeProvider.themeData,
+            themeAnimationDuration: const Duration(milliseconds: 400),
+            themeAnimationCurve: Curves.easeInOut,
             scrollBehavior: NoStretchScrollBehavior(),
             initialRoute: '/',
-            routes: {
-              '/': (context) => const SplashScreen(),
-              '/home': (context) => const HomeScreen(),
+            onGenerateRoute: (settings) {
+              switch (settings.name) {
+                case '/':
+                  return FadePageRoute(page: const SplashScreen());
+                case '/home':
+                  return FadePageRoute(page: const HomeScreen());
+                default:
+                  return null;
+              }
             },
           );
         },

@@ -112,13 +112,21 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
     return AppBar(
       backgroundColor: isDark ? AppColors.black : AppColors.white,
       surfaceTintColor: Colors.transparent,
+      centerTitle: true,
       leading: IconButton(
-        icon: Icon(
-          Icons.arrow_back_ios_new_rounded,
-          color: isDark ? AppColors.white : AppColors.black,
-          size: 20,
-        ),
         onPressed: () => Navigator.pop(context),
+        icon: Container(
+          padding: const EdgeInsets.all(6),
+          decoration: BoxDecoration(
+            color: isDark ? AppColors.darkSurfaceContainer : AppColors.lightGray,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: isDark ? AppColors.white : AppColors.black,
+            size: 16,
+          ),
+        ),
       ),
       title: Text(
         languageProvider.tr('addSubscription'),

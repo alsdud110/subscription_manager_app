@@ -10,6 +10,9 @@ class ThemeProvider extends ChangeNotifier {
 
   ThemeData get themeData => _isDarkMode ? _darkTheme : _lightTheme;
 
+  static ThemeData get lightTheme => _lightTheme;
+  static ThemeData get darkTheme => _darkTheme;
+
   ThemeProvider() {
     _loadTheme();
   }

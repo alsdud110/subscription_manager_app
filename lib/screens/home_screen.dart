@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import '../constants/colors.dart';
 import '../models/subscription.dart';
 import '../providers/theme_provider.dart';
@@ -10,6 +11,7 @@ import '../widgets/subscription_bottom_sheet.dart';
 import '../widgets/summary_cards.dart';
 import 'select_service_screen.dart';
 import 'settings_screen.dart';
+import '../utils/page_transitions.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -36,16 +38,25 @@ class _HomeScreenState extends State<HomeScreen> {
       floatingActionButton: _buildFab(context, isDark),
       body: subscriptionProvider.isLoading
           ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              child: Column(
-                children: [
-                  const SizedBox(height: 8),
-                  _buildCalendar(
-                      context, subscriptionProvider, isDark, languageProvider),
-                  const SizedBox(height: 20),
-                  const SummaryCards(),
-                  const SizedBox(height: 32),
-                ],
+          : AnimationLimiter(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: AnimationConfiguration.toStaggeredList(
+                    duration: const Duration(milliseconds: 600),
+                    childAnimationBuilder: (widget) => SlideAnimation(
+                      verticalOffset: 50.0,
+                      child: FadeInAnimation(child: widget),
+                    ),
+                    children: [
+                      const SizedBox(height: 8),
+                      _buildCalendar(context, subscriptionProvider, isDark,
+                          languageProvider),
+                      const SizedBox(height: 20),
+                      const SummaryCards(),
+                      const SizedBox(height: 32),
+                    ],
+                  ),
+                ),
               ),
             ),
     );
@@ -84,15 +95,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      leading: IconButton(
-        icon: Icon(
-          themeProvider.isDarkMode
-              ? Icons.light_mode_outlined
-              : Icons.dark_mode_outlined,
-          color: AppColors.gray,
-        ),
-        onPressed: () => themeProvider.toggleTheme(),
-      ),
       actions: [
         IconButton(
           icon: const Icon(
@@ -102,7 +104,7 @@ class _HomeScreenState extends State<HomeScreen> {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const SettingsScreen()),
+              FadeSlidePageRoute(page: const SettingsScreen()),
             );
           },
         ),
@@ -127,8 +129,7 @@ class _HomeScreenState extends State<HomeScreen> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(
-                builder: (context) => const SelectServiceScreen()),
+            FadeSlidePageRoute(page: const SelectServiceScreen()),
           );
         },
         backgroundColor: Colors.transparent,
