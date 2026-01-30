@@ -89,15 +89,15 @@ class _HomeScreenState extends State<HomeScreen> {
           themeProvider.isDarkMode
               ? Icons.light_mode_outlined
               : Icons.dark_mode_outlined,
-          color: isDark ? AppColors.gray : AppColors.gray,
+          color: AppColors.gray,
         ),
         onPressed: () => themeProvider.toggleTheme(),
       ),
       actions: [
         IconButton(
-          icon: Icon(
+          icon: const Icon(
             Icons.settings_outlined,
-            color: isDark ? AppColors.gray : AppColors.gray,
+            color: AppColors.gray,
           ),
           onPressed: () {
             Navigator.push(
@@ -117,7 +117,7 @@ class _HomeScreenState extends State<HomeScreen> {
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: AppColors.mint.withValues(alpha: 0.4),
+            color: AppColors.mint.withOpacity(0.4),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -198,88 +198,43 @@ class _HomeScreenState extends State<HomeScreen> {
           eventLoader: (day) {
             return subscriptionProvider.getSubscriptionsForDate(day);
           },
-          calendarStyle: CalendarStyle(
+          calendarStyle: const CalendarStyle(
             outsideDaysVisible: false,
-            markersMaxCount: 3,
-            markerSize: 6,
-            markerMargin: const EdgeInsets.symmetric(horizontal: 1),
-            todayDecoration: BoxDecoration(
-              color: AppColors.mint.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            todayTextStyle: TextStyle(
-              color: isDark ? AppColors.white : AppColors.black,
-              fontWeight: FontWeight.w600,
-            ),
-            selectedDecoration: BoxDecoration(
-              gradient: AppColors.primaryGradient,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            selectedTextStyle: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w600,
-            ),
-            defaultTextStyle: TextStyle(
-              color: isDark ? AppColors.white : AppColors.black,
-              fontWeight: FontWeight.w500,
-            ),
-            weekendTextStyle: TextStyle(
-              color: isDark ? AppColors.gray : AppColors.gray,
-              fontWeight: FontWeight.w500,
-            ),
+            // 기본 동그라미 데코레이션 제거하여 커스텀 빌더가 보이게 함
+            todayDecoration: BoxDecoration(color: Colors.transparent),
+            selectedDecoration: BoxDecoration(color: Colors.transparent),
           ),
           headerStyle: HeaderStyle(
             formatButtonVisible: false,
             titleCentered: true,
-            leftChevronPadding: const EdgeInsets.all(12),
-            rightChevronPadding: const EdgeInsets.all(12),
             titleTextStyle: TextStyle(
               fontSize: 17,
               fontWeight: FontWeight.w600,
               color: isDark ? AppColors.white : AppColors.black,
             ),
-            leftChevronIcon: Icon(
-              Icons.chevron_left_rounded,
-              color: isDark ? AppColors.gray : AppColors.gray,
-            ),
-            rightChevronIcon: Icon(
-              Icons.chevron_right_rounded,
-              color: isDark ? AppColors.gray : AppColors.gray,
-            ),
-          ),
-          daysOfWeekStyle: DaysOfWeekStyle(
-            weekdayStyle: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: isDark ? AppColors.gray : AppColors.gray,
-            ),
-            weekendStyle: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color:
-                  (isDark ? AppColors.gray : AppColors.gray).withOpacity(0.7),
-            ),
+            leftChevronIcon:
+                const Icon(Icons.chevron_left_rounded, color: AppColors.gray),
+            rightChevronIcon:
+                const Icon(Icons.chevron_right_rounded, color: AppColors.gray),
           ),
           calendarBuilders: CalendarBuilders(
-            defaultBuilder: (context, date, focusedDay) {
+            // 모든 상태에서 사각형 박스 디자인(_buildDayCell)을 사용하도록 고정
+            defaultBuilder: (context, date, _) {
               final events = subscriptionProvider.getSubscriptionsForDate(date);
               return _buildDayCell(date, events.cast<Subscription>(), isDark,
                   isSelected: false, isToday: false);
             },
-            todayBuilder: (context, date, focusedDay) {
+            todayBuilder: (context, date, _) {
               final events = subscriptionProvider.getSubscriptionsForDate(date);
-              if (events.isEmpty) return null;
               return _buildDayCell(date, events.cast<Subscription>(), isDark,
                   isSelected: false, isToday: true);
             },
-            selectedBuilder: (context, date, focusedDay) {
+            selectedBuilder: (context, date, _) {
               final events = subscriptionProvider.getSubscriptionsForDate(date);
               return _buildDayCell(date, events.cast<Subscription>(), isDark,
                   isSelected: true, isToday: false);
             },
-            markerBuilder: (context, date, events) {
-              return const SizedBox.shrink();
-            },
+            markerBuilder: (context, date, events) => const SizedBox.shrink(),
           ),
         ),
       ),
@@ -298,12 +253,10 @@ class _HomeScreenState extends State<HomeScreen> {
     return Container(
       width: double.infinity,
       height: double.infinity,
-      margin: const EdgeInsets.all(3), // 박스 간격
+      margin: const EdgeInsets.all(3),
       decoration: BoxDecoration(
         gradient: isSelected ? AppColors.primaryGradient : null,
-        color: isToday && !isSelected
-            ? AppColors.mint.withValues(alpha: 0.2)
-            : null,
+        color: isToday && !isSelected ? AppColors.mint.withOpacity(0.2) : null,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
@@ -312,7 +265,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Text(
             '${date.day}',
             style: TextStyle(
-              fontSize: hasEvents ? 11 : 14,
+              fontSize: 14,
               fontWeight:
                   isSelected || isToday ? FontWeight.w600 : FontWeight.w500,
               color: isSelected
@@ -320,49 +273,54 @@ class _HomeScreenState extends State<HomeScreen> {
                   : (isDark ? AppColors.white : AppColors.black),
             ),
           ),
-          if (hasEvents) ...[
-            const SizedBox(height: 2),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: events.take(3).map((subscription) {
-                if (subscription.iconPath != null) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 1),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(3),
-                      child: Image.asset(
-                        subscription.iconPath!,
-                        width: 14,
-                        height: 14,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  );
-                } else {
-                  return Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 1),
-                    width: 14,
-                    height: 14,
-                    decoration: BoxDecoration(
-                      color: Color(subscription.colorValue),
-                      borderRadius: BorderRadius.circular(3),
-                    ),
-                    child: Center(
-                      child: Text(
-                        subscription.serviceIcon,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 8,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  );
-                }
-              }).toList(),
-            ),
-          ],
+          const SizedBox(height: 2),
+          // 아이콘 영역 높이를 고정하여 이벤트 유무와 상관없이 숫자의 위치를 유지함
+          SizedBox(
+            height: 16,
+            child: hasEvents
+                ? Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: events
+                        .take(3)
+                        .map((sub) => _buildMiniIcon(sub))
+                        .toList(),
+                  )
+                : const SizedBox.shrink(),
+          ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildMiniIcon(Subscription sub) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 1),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(3),
+        child: sub.iconPath != null
+            ? Image.asset(
+                sub.iconPath!,
+                width: 14,
+                height: 14,
+                fit: BoxFit.cover,
+              )
+            : Container(
+                width: 14,
+                height: 14,
+                decoration: BoxDecoration(
+                  color: Color(sub.colorValue),
+                  borderRadius: BorderRadius.circular(3),
+                ),
+                child: Center(
+                  child: Text(
+                    sub.serviceIcon,
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 8,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
       ),
     );
   }
