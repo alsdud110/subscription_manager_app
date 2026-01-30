@@ -136,20 +136,34 @@ class SubscriptionBottomSheet extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: Color(subscription.colorValue).withAlpha(38),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Center(
-              child: Text(
-                subscription.serviceIcon,
-                style: const TextStyle(fontSize: 24),
-              ),
-            ),
-          ),
+          subscription.iconPath != null
+              ? ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.asset(
+                    subscription.iconPath!,
+                    width: 48,
+                    height: 48,
+                    fit: BoxFit.cover,
+                  ),
+                )
+              : Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: Color(subscription.colorValue).withAlpha(38),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Center(
+                    child: Text(
+                      subscription.serviceIcon,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Color(subscription.colorValue),
+                      ),
+                    ),
+                  ),
+                ),
           const SizedBox(width: 14),
           Expanded(
             child: Column(

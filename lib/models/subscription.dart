@@ -8,6 +8,7 @@ class Subscription {
   final String id;
   final String serviceName;
   final String serviceIcon;
+  final String? iconPath;
   final double amount;
   final Currency currency;
   final BillingCycle billingCycle;
@@ -23,6 +24,7 @@ class Subscription {
     required this.id,
     required this.serviceName,
     required this.serviceIcon,
+    this.iconPath,
     required this.amount,
     required this.currency,
     required this.billingCycle,
@@ -40,6 +42,7 @@ class Subscription {
       'id': id,
       'serviceName': serviceName,
       'serviceIcon': serviceIcon,
+      'iconPath': iconPath,
       'amount': amount,
       'currency': currency.name,
       'billingCycle': billingCycle.name,
@@ -58,6 +61,7 @@ class Subscription {
       id: json['id'],
       serviceName: json['serviceName'],
       serviceIcon: json['serviceIcon'],
+      iconPath: json['iconPath'],
       amount: json['amount'].toDouble(),
       currency: Currency.values.firstWhere((e) => e.name == json['currency']),
       billingCycle: BillingCycle.values.firstWhere((e) => e.name == json['billingCycle']),

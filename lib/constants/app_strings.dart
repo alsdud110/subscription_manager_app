@@ -133,6 +133,8 @@ class AppStrings {
     'exchangeRateDescription': '1 USD = ? KRW',
     'krwFull': '원 (KRW)',
     'usdFull': '달러 (USD)',
+    'won': '원',
+    'dollar': '달러',
     'save': '저장',
 
     // App Info
@@ -272,6 +274,8 @@ class AppStrings {
     'exchangeRateDescription': '1 USD = ? KRW',
     'krwFull': 'Won (KRW)',
     'usdFull': 'Dollar (USD)',
+    'won': 'Won',
+    'dollar': 'Dollar',
     'save': 'Save',
 
     // App Info

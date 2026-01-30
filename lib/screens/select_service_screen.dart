@@ -212,12 +212,12 @@ class _SelectServiceScreenState extends State<SelectServiceScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
           color: isSelected
-              ? Color(service.defaultColor).withValues(alpha: 0.15)
+              ? AppColors.mint.withValues(alpha: 0.15)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: isSelected
-                ? Color(service.defaultColor)
+                ? AppColors.mint
                 : (isDark ? AppColors.darkOutline : AppColors.mediumGray),
             width: isSelected ? 1.5 : 1,
           ),
@@ -243,7 +243,7 @@ class _SelectServiceScreenState extends State<SelectServiceScreen> {
                 fontSize: 14,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                 color: isSelected
-                    ? Color(service.defaultColor)
+                    ? AppColors.teal
                     : (isDark ? AppColors.white : AppColors.black),
               ),
             ),

@@ -84,7 +84,7 @@ class SummaryCards extends StatelessWidget {
     required bool isDark,
     required String noSubscriptionsText,
   }) {
-    final formatter = NumberFormat.currency(symbol: currencySymbol, decimalDigits: decimalDigits);
+    final formatter = NumberFormat.currency(symbol: '', decimalDigits: decimalDigits);
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -106,13 +106,28 @@ class SummaryCards extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           if (totalAmount > 0)
-            Text(
-              formatter.format(totalAmount),
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w700,
-                color: isDark ? AppColors.white : AppColors.black,
-                letterSpacing: -0.5,
+            RichText(
+              text: TextSpan(
+                children: [
+                  TextSpan(
+                    text: currencySymbol,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                      color: isDark ? AppColors.white : AppColors.black,
+                      fontFamily: 'Roboto',
+                    ),
+                  ),
+                  TextSpan(
+                    text: formatter.format(totalAmount),
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                      color: isDark ? AppColors.white : AppColors.black,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+                ],
               ),
             )
           else

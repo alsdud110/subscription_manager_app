@@ -261,29 +261,103 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           calendarBuilders: CalendarBuilders(
-            markerBuilder: (context, date, events) {
+            defaultBuilder: (context, date, focusedDay) {
+              final events = subscriptionProvider.getSubscriptionsForDate(date);
               if (events.isEmpty) return null;
-              return Positioned(
-                bottom: 8,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: events.take(3).map((event) {
-                    final subscription = event as Subscription;
-                    return Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 1),
-                      width: 6,
-                      height: 6,
-                      decoration: BoxDecoration(
-                        color: Color(subscription.colorValue),
-                        shape: BoxShape.circle,
-                      ),
-                    );
-                  }).toList(),
-                ),
-              );
+              return _buildDayCell(date, events.cast<Subscription>(), isDark, isSelected: false, isToday: false);
+            },
+            todayBuilder: (context, date, focusedDay) {
+              final events = subscriptionProvider.getSubscriptionsForDate(date);
+              if (events.isEmpty) return null;
+              return _buildDayCell(date, events.cast<Subscription>(), isDark, isSelected: false, isToday: true);
+            },
+            selectedBuilder: (context, date, focusedDay) {
+              final events = subscriptionProvider.getSubscriptionsForDate(date);
+              return _buildDayCell(date, events.cast<Subscription>(), isDark, isSelected: true, isToday: false);
+            },
+            markerBuilder: (context, date, events) {
+              return const SizedBox.shrink();
             },
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildDayCell(
+    DateTime date,
+    List<Subscription> events,
+    bool isDark, {
+    required bool isSelected,
+    required bool isToday,
+  }) {
+    final hasEvents = events.isNotEmpty;
+
+    return Container(
+      margin: const EdgeInsets.all(2),
+      decoration: BoxDecoration(
+        gradient: isSelected ? AppColors.primaryGradient : null,
+        color: isToday && !isSelected
+            ? AppColors.mint.withValues(alpha: 0.2)
+            : null,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            '${date.day}',
+            style: TextStyle(
+              fontSize: hasEvents ? 11 : 14,
+              fontWeight: isSelected || isToday ? FontWeight.w600 : FontWeight.w500,
+              color: isSelected
+                  ? Colors.white
+                  : (isDark ? AppColors.white : AppColors.black),
+            ),
+          ),
+          if (hasEvents) ...[
+            const SizedBox(height: 2),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: events.take(3).map((subscription) {
+                if (subscription.iconPath != null) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 1),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(3),
+                      child: Image.asset(
+                        subscription.iconPath!,
+                        width: 14,
+                        height: 14,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  );
+                } else {
+                  return Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 1),
+                    width: 14,
+                    height: 14,
+                    decoration: BoxDecoration(
+                      color: Color(subscription.colorValue),
+                      borderRadius: BorderRadius.circular(3),
+                    ),
+                    child: Center(
+                      child: Text(
+                        subscription.serviceIcon,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 8,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  );
+                }
+              }).toList(),
+            ),
+          ],
+        ],
       ),
     );
   }
