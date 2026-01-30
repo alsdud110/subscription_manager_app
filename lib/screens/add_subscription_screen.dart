@@ -142,7 +142,9 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
             width: 72,
             height: 72,
             decoration: BoxDecoration(
-              color: hasIcon ? Colors.transparent : Color(_selectedColorValue).withValues(alpha: 0.15),
+              color: hasIcon
+                  ? Colors.transparent
+                  : Color(_selectedColorValue).withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(18),
             ),
             child: hasIcon
@@ -194,7 +196,8 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
     );
   }
 
-  Widget _buildServiceNameField(bool isDark, LanguageProvider languageProvider) {
+  Widget _buildServiceNameField(
+      bool isDark, LanguageProvider languageProvider) {
     return TextFormField(
       controller: _serviceNameController,
       decoration: InputDecoration(
@@ -204,7 +207,8 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
           fontWeight: FontWeight.w500,
         ),
         filled: true,
-        fillColor: isDark ? AppColors.darkSurfaceContainer : AppColors.lightGray,
+        fillColor:
+            isDark ? AppColors.darkSurfaceContainer : AppColors.lightGray,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
@@ -223,7 +227,8 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
             width: 1.5,
           ),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       ),
       style: TextStyle(
         color: isDark ? AppColors.white : AppColors.black,
@@ -264,7 +269,8 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
                 ),
               ),
               child: isSelected
-                  ? const Icon(Icons.check_rounded, color: AppColors.white, size: 20)
+                  ? const Icon(Icons.check_rounded,
+                      color: AppColors.white, size: 20)
                   : null,
             ),
           );
@@ -315,7 +321,8 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
                   color: isDark ? AppColors.white : AppColors.black,
                   size: 18,
                 ),
-                dropdownColor: isDark ? AppColors.darkSurfaceContainer : AppColors.white,
+                dropdownColor:
+                    isDark ? AppColors.darkSurfaceContainer : AppColors.white,
                 style: TextStyle(
                   color: isDark ? AppColors.white : AppColors.black,
                   fontWeight: FontWeight.w500,
@@ -369,7 +376,8 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
         ),
         suffixIconConstraints: const BoxConstraints(minWidth: 90),
         filled: true,
-        fillColor: isDark ? AppColors.darkSurfaceContainer : AppColors.lightGray,
+        fillColor:
+            isDark ? AppColors.darkSurfaceContainer : AppColors.lightGray,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
@@ -388,7 +396,8 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
             width: 1.5,
           ),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       ),
       style: TextStyle(
         color: isDark ? AppColors.white : AppColors.black,
@@ -478,7 +487,8 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
               decoration: BoxDecoration(
                 border: Border(
                   bottom: BorderSide(
-                    color: isDark ? AppColors.darkOutline : AppColors.mediumGray,
+                    color:
+                        isDark ? AppColors.darkOutline : AppColors.mediumGray,
                     width: 0.5,
                   ),
                 ),
@@ -537,7 +547,20 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
     if (languageProvider.isKorean) {
       return '${date.year}년 ${date.month}월 ${date.day}일';
     }
-    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    final months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec'
+    ];
     return '${months[date.month - 1]} ${date.day}, ${date.year}';
   }
 
@@ -585,7 +608,8 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
     );
   }
 
-  Widget _buildBillingCycleSelector(bool isDark, LanguageProvider languageProvider) {
+  Widget _buildBillingCycleSelector(
+      bool isDark, LanguageProvider languageProvider) {
     final cycles = [
       (BillingCycle.monthly, languageProvider.tr('monthly')),
       (BillingCycle.yearly, languageProvider.tr('yearly')),
@@ -605,7 +629,9 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
             decoration: BoxDecoration(
               color: isSelected
                   ? (isDark ? AppColors.white : AppColors.black)
-                  : (isDark ? AppColors.darkSurfaceContainer : AppColors.lightGray),
+                  : (isDark
+                      ? AppColors.darkSurfaceContainer
+                      : AppColors.lightGray),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
                 color: isSelected
@@ -630,7 +656,8 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
     );
   }
 
-  Widget _buildBillingCycleOptions(bool isDark, LanguageProvider languageProvider) {
+  Widget _buildBillingCycleOptions(
+      bool isDark, LanguageProvider languageProvider) {
     switch (_billingCycle) {
       case BillingCycle.once:
         return Column(
@@ -680,40 +707,88 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
       (12, languageProvider.tr('december')),
     ];
 
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: months.map((month) {
-        final isSelected = _month == month.$1;
-        return GestureDetector(
-          onTap: () => setState(() => _month = month.$1),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: isSelected
-                  ? (isDark ? AppColors.white : AppColors.black)
-                  : (isDark ? AppColors.darkSurfaceContainer : AppColors.lightGray),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: isSelected
-                    ? Colors.transparent
-                    : (isDark ? AppColors.darkOutline : AppColors.mediumGray),
-                width: 1,
-              ),
-            ),
-            child: Text(
-              month.$2,
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-                color: isSelected
-                    ? (isDark ? AppColors.black : AppColors.white)
-                    : (isDark ? AppColors.white : AppColors.black),
-              ),
-            ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionTitle(languageProvider.tr('month'), isDark),
+        const SizedBox(height: 12),
+        SizedBox(
+          height: 54, // 다른 선택기들과 높이 통일
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: months.length,
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            itemBuilder: (context, index) {
+              final month = months[index];
+              final isSelected = _month == month.$1;
+
+              return GestureDetector(
+                onTap: () => setState(() => _month = month.$1),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? (isDark ? AppColors.white : AppColors.black)
+                        : (isDark
+                            ? AppColors.darkSurfaceContainer
+                            : AppColors.lightGray),
+                    borderRadius: BorderRadius.circular(14),
+                    boxShadow: isSelected
+                        ? [
+                            BoxShadow(
+                              color: (isDark ? Colors.white : Colors.black)
+                                  .withOpacity(0.2),
+                              blurRadius: 8,
+                              offset: const Offset(0, 4),
+                            )
+                          ]
+                        : [],
+                    border: Border.all(
+                      color: isSelected
+                          ? Colors.transparent
+                          : (isDark
+                              ? AppColors.darkOutline
+                              : AppColors.mediumGray),
+                      width: 1,
+                    ),
+                  ),
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          month.$2,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight:
+                                isSelected ? FontWeight.bold : FontWeight.w500,
+                            color: isSelected
+                                ? (isDark ? AppColors.black : AppColors.white)
+                                : (isDark ? AppColors.white : AppColors.black),
+                          ),
+                        ),
+                        if (isSelected)
+                          Container(
+                            margin: const EdgeInsets.only(top: 2),
+                            width: 4,
+                            height: 4,
+                            decoration: BoxDecoration(
+                              color: isDark ? AppColors.black : AppColors.white,
+                              shape: BoxShape.circle,
+                            ),
+                          )
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
           ),
-        );
-      }).toList(),
+        ),
+      ],
     );
   }
 
@@ -728,87 +803,195 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
       (7, languageProvider.tr('sunday')),
     ];
 
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: weekdays.map((day) {
-        final isSelected = _dayOfWeek == day.$1;
-        return GestureDetector(
-          onTap: () => setState(() => _dayOfWeek = day.$1),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            decoration: BoxDecoration(
-              color: isSelected
-                  ? (isDark ? AppColors.white : AppColors.black)
-                  : (isDark ? AppColors.darkSurfaceContainer : AppColors.lightGray),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: isSelected
-                    ? Colors.transparent
-                    : (isDark ? AppColors.darkOutline : AppColors.mediumGray),
-                width: 1,
-              ),
-            ),
-            child: Text(
-              day.$2,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: isSelected
-                    ? (isDark ? AppColors.black : AppColors.white)
-                    : (isDark ? AppColors.white : AppColors.black),
-              ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          height: 54, // 날짜 선택기와 높이 통일
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: weekdays.length,
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            itemBuilder: (context, index) {
+              final day = weekdays[index];
+              final isSelected = _dayOfWeek == day.$1;
+
+              return GestureDetector(
+                onTap: () => setState(() => _dayOfWeek = day.$1),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16), // 요일 텍스트 길이에 맞춰 여백 조절
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? (isDark ? AppColors.white : AppColors.black)
+                        : (isDark
+                            ? AppColors.darkSurfaceContainer
+                            : AppColors.lightGray),
+                    borderRadius: BorderRadius.circular(14),
+                    boxShadow: isSelected
+                        ? [
+                            BoxShadow(
+                              color: (isDark ? Colors.white : Colors.black)
+                                  .withOpacity(0.2),
+                              blurRadius: 8,
+                              offset: const Offset(0, 4),
+                            )
+                          ]
+                        : [],
+                    border: Border.all(
+                      color: isSelected
+                          ? Colors.transparent
+                          : (isDark
+                              ? AppColors.darkOutline
+                              : AppColors.mediumGray),
+                      width: 1,
+                    ),
+                  ),
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          day.$2,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight:
+                                isSelected ? FontWeight.bold : FontWeight.w500,
+                            color: isSelected
+                                ? (isDark ? AppColors.black : AppColors.white)
+                                : (isDark ? AppColors.white : AppColors.black),
+                          ),
+                        ),
+                        if (isSelected)
+                          Container(
+                            margin: const EdgeInsets.only(top: 2),
+                            width: 4,
+                            height: 4,
+                            decoration: BoxDecoration(
+                              color: isDark ? AppColors.black : AppColors.white,
+                              shape: BoxShape.circle,
+                            ),
+                          )
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+        const SizedBox(height: 8),
+        Padding(
+          padding: const EdgeInsets.only(left: 4),
+          child: Text(
+            languageProvider.isKorean
+                ? "매주 ${weekdays.firstWhere((d) => d.$1 == _dayOfWeek).$2}에 결제됩니다."
+                : "Billed every ${weekdays.firstWhere((d) => d.$1 == _dayOfWeek).$2}.",
+            style: TextStyle(
+              fontSize: 12,
+              color: AppColors.gray.withOpacity(0.8),
             ),
           ),
-        );
-      }).toList(),
+        ),
+      ],
     );
   }
 
   Widget _buildDayGrid(bool isDark, LanguageProvider languageProvider) {
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 7,
-        mainAxisSpacing: 8,
-        crossAxisSpacing: 8,
-        childAspectRatio: 1,
-      ),
-      itemCount: 31,
-      itemBuilder: (context, index) {
-        final day = index + 1;
-        final isSelected = _dayOfMonth == day;
-        return GestureDetector(
-          onTap: () => setState(() => _dayOfMonth = day),
-          child: Container(
-            decoration: BoxDecoration(
-              color: isSelected
-                  ? (isDark ? AppColors.white : AppColors.black)
-                  : (isDark ? AppColors.darkSurfaceContainer : AppColors.lightGray),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: isSelected
-                    ? Colors.transparent
-                    : (isDark ? AppColors.darkOutline : AppColors.mediumGray),
-                width: 1,
-              ),
-            ),
-            child: Center(
-              child: Text(
-                '$day',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                  color: isSelected
-                      ? (isDark ? AppColors.black : AppColors.white)
-                      : (isDark ? AppColors.white : AppColors.black),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          height: 54, // 피커 높이
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: 31,
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            itemBuilder: (context, index) {
+              final day = index + 1;
+              final isSelected = _dayOfMonth == day;
+
+              return GestureDetector(
+                onTap: () => setState(() => _dayOfMonth = day),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                  width: 46,
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? (isDark ? AppColors.white : AppColors.black)
+                        : (isDark
+                            ? AppColors.darkSurfaceContainer
+                            : AppColors.lightGray),
+                    borderRadius: BorderRadius.circular(14),
+                    boxShadow: isSelected
+                        ? [
+                            BoxShadow(
+                              color: (isDark ? Colors.white : Colors.black)
+                                  .withOpacity(0.2),
+                              blurRadius: 8,
+                              offset: const Offset(0, 4),
+                            )
+                          ]
+                        : [],
+                    border: Border.all(
+                      color: isSelected
+                          ? Colors.transparent
+                          : (isDark
+                              ? AppColors.darkOutline
+                              : AppColors.mediumGray),
+                      width: 1,
+                    ),
+                  ),
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          '$day',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight:
+                                isSelected ? FontWeight.bold : FontWeight.w500,
+                            color: isSelected
+                                ? (isDark ? AppColors.black : AppColors.white)
+                                : (isDark ? AppColors.white : AppColors.black),
+                          ),
+                        ),
+                        if (isSelected)
+                          Container(
+                            margin: const EdgeInsets.only(top: 2),
+                            width: 4,
+                            height: 4,
+                            decoration: BoxDecoration(
+                              color: isDark ? AppColors.black : AppColors.white,
+                              shape: BoxShape.circle,
+                            ),
+                          )
+                      ],
+                    ),
+                  ),
                 ),
-              ),
+              );
+            },
+          ),
+        ),
+        const SizedBox(height: 8),
+        Padding(
+          padding: const EdgeInsets.only(left: 4),
+          child: Text(
+            _getCycleNotificationText(languageProvider), // 함수로 분리하여 호출
+            style: TextStyle(
+              fontSize: 12,
+              color: AppColors.gray.withOpacity(0.8),
             ),
           ),
-        );
-      },
+        ),
+      ],
     );
   }
 
@@ -873,7 +1056,10 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
         billingCycle: _billingCycle,
         dayOfWeek: _billingCycle == BillingCycle.weekly ? _dayOfWeek : null,
         dayOfMonth: _billingCycle != BillingCycle.weekly ? _dayOfMonth : null,
-        month: (_billingCycle == BillingCycle.yearly || _billingCycle == BillingCycle.once) ? _month : null,
+        month: (_billingCycle == BillingCycle.yearly ||
+                _billingCycle == BillingCycle.once)
+            ? _month
+            : null,
         createdAt: DateTime.now(),
         colorValue: _selectedColorValue,
         startDate: _startDate,
@@ -883,14 +1069,16 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
       Provider.of<SubscriptionProvider>(context, listen: false)
           .addSubscription(subscription);
 
-      _showToast(context, languageProvider.tr('subscriptionAdded'), isSuccess: true);
+      _showToast(context, languageProvider.tr('subscriptionAdded'),
+          isSuccess: true);
 
       // Pop twice to go back to home (past service selection screen)
       Navigator.of(context).popUntil((route) => route.isFirst);
     }
   }
 
-  void _showToast(BuildContext context, String message, {bool isSuccess = false}) {
+  void _showToast(BuildContext context, String message,
+      {bool isSuccess = false}) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final fToast = FToast();
     fToast.init(context);
@@ -916,5 +1104,37 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
       gravity: ToastGravity.BOTTOM,
       toastDuration: const Duration(seconds: 2),
     );
+  }
+
+  String _getCycleNotificationText(LanguageProvider lp) {
+    if (lp.isKorean) {
+      switch (_billingCycle) {
+        case BillingCycle.once:
+          return "$_month월 $_dayOfMonth일에 결제됩니다.";
+        case BillingCycle.weekly:
+          final days = ['', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일'];
+          return "매주 ${days[_dayOfWeek]}에 결제됩니다.";
+        case BillingCycle.monthly:
+          return "매월 $_dayOfMonth일에 결제됩니다.";
+        case BillingCycle.yearly:
+          return "매년 $_month월 $_dayOfMonth일에 결제됩니다."; // '매년'으로 수정
+        default:
+          return "";
+      }
+    } else {
+      // 영어 버전 대응
+      switch (_billingCycle) {
+        case BillingCycle.once:
+          return "Will be billed on $_month/$_dayOfMonth.";
+        case BillingCycle.weekly:
+          return "Billed every week.";
+        case BillingCycle.monthly:
+          return "Billed on the ${_dayOfMonth}th of every month.";
+        case BillingCycle.yearly:
+          return "Billed on $_month/$_dayOfMonth every year.";
+        default:
+          return "";
+      }
+    }
   }
 }
