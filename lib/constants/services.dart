@@ -9,6 +9,8 @@ enum ServiceCategory {
   mobility,
   reading,
   gaming,
+  camera,
+  social,
   other,
 }
 
@@ -38,6 +40,8 @@ class ServiceData {
     ServiceCategory.mobility: 'mobility',
     ServiceCategory.reading: 'reading',
     ServiceCategory.gaming: 'gaming',
+    ServiceCategory.camera: 'camera',
+    ServiceCategory.social: 'social',
     ServiceCategory.other: 'other',
   };
 
@@ -50,6 +54,8 @@ class ServiceData {
     ServiceCategory.mobility: '모빌리티',
     ServiceCategory.reading: '독서',
     ServiceCategory.gaming: '게임',
+    ServiceCategory.camera: '카메라',
+    ServiceCategory.social: '소셜',
     ServiceCategory.other: '기타',
   };
 
@@ -399,12 +405,75 @@ class ServiceData {
         category: ServiceCategory.gaming,
         defaultColor: 0xFF107C10,
         iconPath: 'assets/icon/XBOX_logo_icon.png'),
+    // 카메라
     ServiceInfo(
         id: 'snow',
         name: 'SNOW',
-        category: ServiceCategory.gaming,
+        category: ServiceCategory.camera,
         defaultColor: 0xFF00D8FF,
         iconPath: 'assets/icon/SNOW_logo_icon.png'),
+    ServiceInfo(
+        id: 'soda',
+        name: 'SODA',
+        category: ServiceCategory.camera,
+        defaultColor: 0xFFFF6B81,
+        iconPath: 'assets/icon/SODA_logo_icon.png'),
+    ServiceInfo(
+        id: 'b612',
+        name: 'B612',
+        category: ServiceCategory.camera,
+        defaultColor: 0xFFFF9500,
+        iconPath: 'assets/icon/B612_logo_icon.png'),
+    ServiceInfo(
+        id: 'foodie',
+        name: 'Foodie',
+        category: ServiceCategory.camera,
+        defaultColor: 0xFFFFD700,
+        iconPath: 'assets/icon/FOODIE_logo_icon.png'),
+    ServiceInfo(
+        id: 'ulike',
+        name: 'Ulike',
+        category: ServiceCategory.camera,
+        defaultColor: 0xFFFF6699,
+        iconPath: 'assets/icon/ULIKE_logo_icon.png'),
+    ServiceInfo(
+        id: 'capcut',
+        name: 'CapCut',
+        category: ServiceCategory.camera,
+        defaultColor: 0xFF000000,
+        iconPath: 'assets/icon/CAPCUT_logo_icon.png'),
+    ServiceInfo(
+        id: 'vita',
+        name: 'VITA',
+        category: ServiceCategory.camera,
+        defaultColor: 0xFF00D4AA,
+        iconPath: 'assets/icon/VITA_logo_icon.png'),
+
+    // 소셜
+    ServiceInfo(
+        id: 'between',
+        name: '비트윈',
+        category: ServiceCategory.social,
+        defaultColor: 0xFFFF6B6B,
+        iconPath: 'assets/icon/BETWEEN_logo_icon.png'),
+    ServiceInfo(
+        id: 'someone',
+        name: '썸원',
+        category: ServiceCategory.social,
+        defaultColor: 0xFFFF85A2,
+        iconPath: 'assets/icon/SOMEONE_logo_icon.png'),
+    ServiceInfo(
+        id: 'cupist',
+        name: '글램',
+        category: ServiceCategory.social,
+        defaultColor: 0xFFE91E63,
+        iconPath: 'assets/icon/GLAM_logo_icon.png'),
+    ServiceInfo(
+        id: 'tinder',
+        name: 'Tinder',
+        category: ServiceCategory.social,
+        defaultColor: 0xFFFF6B6B,
+        iconPath: 'assets/icon/TINDER_logo_icon.png'),
 
     // 기타
     ServiceInfo(
@@ -413,6 +482,51 @@ class ServiceData {
         category: ServiceCategory.other,
         defaultColor: 0xFFFEE500,
         iconPath: 'assets/icon/KAKAOTALK_logo_icon.png'),
+
+    // 추가 인기 서비스
+    // 스트리밍
+    ServiceInfo(
+        id: 'hbo_max',
+        name: 'HBO Max',
+        category: ServiceCategory.streaming,
+        defaultColor: 0xFF5822B4,
+        iconPath: 'assets/icon/HBO_MAX_logo_icon.png'),
+    ServiceInfo(
+        id: 'twitch',
+        name: 'Twitch',
+        category: ServiceCategory.streaming,
+        defaultColor: 0xFF9146FF,
+        iconPath: 'assets/icon/TWITCH_logo_icon.png'),
+
+    // 클라우드
+    ServiceInfo(
+        id: 'dropbox',
+        name: 'Dropbox',
+        category: ServiceCategory.cloud,
+        defaultColor: 0xFF0061FF,
+        iconPath: 'assets/icon/DROPBOX_logo_icon.png'),
+
+    // 생산성
+    ServiceInfo(
+        id: 'canva',
+        name: 'Canva',
+        category: ServiceCategory.productivity,
+        defaultColor: 0xFF00C4CC,
+        iconPath: 'assets/icon/CANVA_logo_icon.png'),
+    ServiceInfo(
+        id: 'zoom',
+        name: 'Zoom',
+        category: ServiceCategory.productivity,
+        defaultColor: 0xFF2D8CFF,
+        iconPath: 'assets/icon/ZOOM_logo_icon.png'),
+
+    // 독서
+    ServiceInfo(
+        id: 'audible',
+        name: 'Audible',
+        category: ServiceCategory.reading,
+        defaultColor: 0xFFF8991C,
+        iconPath: 'assets/icon/AUDIBLE_logo_icon.png'),
   ];
 
   static List<ServiceInfo> getServicesByCategory(ServiceCategory category) {
