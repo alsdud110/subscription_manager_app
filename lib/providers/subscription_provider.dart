@@ -36,6 +36,14 @@ class SubscriptionProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> clearAllSubscriptions() async {
+    _subscriptions.clear();
+    await _storageService.saveSubscriptions(_subscriptions);
+    notifyListeners();
+  }
+
+  int get subscriptionCount => _subscriptions.length;
+
   List<Subscription> getSubscriptionsForDate(DateTime date) {
     return _subscriptions.where((sub) => sub.occursOnDate(date)).toList();
   }

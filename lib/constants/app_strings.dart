@@ -140,6 +140,17 @@ class AppStrings {
     'appInfo': '앱 정보',
     'fontLicense': '폰트 라이선스',
     'fontLicenseText': '이 앱에는 (주)여기어때컴퍼니가 제공한 여기어때 잘난체가 적용되어 있습니다.',
+
+    // Data Management
+    'dataManagement': '데이터 관리',
+    'resetAllSubscriptions': '구독 초기화',
+    'resetAllSubscriptionsDesc': '등록된 모든 구독을 삭제합니다',
+    'resetConfirmTitle': '구독 초기화',
+    'resetConfirmMessage': '등록된 모든 구독이 삭제됩니다.\n이 작업은 되돌릴 수 없습니다.',
+    'reset': '초기화',
+    'subscriptionsReset': '모든 구독이 초기화되었습니다',
+    'noSubscriptionsToReset': '초기화할 구독이 없습니다',
+    'registeredSubscriptions': '개의 구독이 등록됨',
   };
 
   // English strings
@@ -268,5 +279,16 @@ class AppStrings {
     'appInfo': 'App Info',
     'fontLicense': 'Font License',
     'fontLicenseText': 'This app uses Jalnan font provided by Yanolja Company.',
+
+    // Data Management
+    'dataManagement': 'Data Management',
+    'resetAllSubscriptions': 'Reset Subscriptions',
+    'resetAllSubscriptionsDesc': 'Delete all registered subscriptions',
+    'resetConfirmTitle': 'Reset Subscriptions',
+    'resetConfirmMessage': 'All registered subscriptions will be deleted.\nThis action cannot be undone.',
+    'reset': 'Reset',
+    'subscriptionsReset': 'All subscriptions have been reset',
+    'noSubscriptionsToReset': 'No subscriptions to reset',
+    'registeredSubscriptions': 'subscription(s) registered',
   };
 }
