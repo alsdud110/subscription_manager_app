@@ -263,17 +263,19 @@ class _HomeScreenState extends State<HomeScreen> {
           calendarBuilders: CalendarBuilders(
             defaultBuilder: (context, date, focusedDay) {
               final events = subscriptionProvider.getSubscriptionsForDate(date);
-              if (events.isEmpty) return null;
-              return _buildDayCell(date, events.cast<Subscription>(), isDark, isSelected: false, isToday: false);
+              return _buildDayCell(date, events.cast<Subscription>(), isDark,
+                  isSelected: false, isToday: false);
             },
             todayBuilder: (context, date, focusedDay) {
               final events = subscriptionProvider.getSubscriptionsForDate(date);
               if (events.isEmpty) return null;
-              return _buildDayCell(date, events.cast<Subscription>(), isDark, isSelected: false, isToday: true);
+              return _buildDayCell(date, events.cast<Subscription>(), isDark,
+                  isSelected: false, isToday: true);
             },
             selectedBuilder: (context, date, focusedDay) {
               final events = subscriptionProvider.getSubscriptionsForDate(date);
-              return _buildDayCell(date, events.cast<Subscription>(), isDark, isSelected: true, isToday: false);
+              return _buildDayCell(date, events.cast<Subscription>(), isDark,
+                  isSelected: true, isToday: false);
             },
             markerBuilder: (context, date, events) {
               return const SizedBox.shrink();
@@ -294,7 +296,9 @@ class _HomeScreenState extends State<HomeScreen> {
     final hasEvents = events.isNotEmpty;
 
     return Container(
-      margin: const EdgeInsets.all(2),
+      width: double.infinity,
+      height: double.infinity,
+      margin: const EdgeInsets.all(3), // 박스 간격
       decoration: BoxDecoration(
         gradient: isSelected ? AppColors.primaryGradient : null,
         color: isToday && !isSelected
@@ -309,7 +313,8 @@ class _HomeScreenState extends State<HomeScreen> {
             '${date.day}',
             style: TextStyle(
               fontSize: hasEvents ? 11 : 14,
-              fontWeight: isSelected || isToday ? FontWeight.w600 : FontWeight.w500,
+              fontWeight:
+                  isSelected || isToday ? FontWeight.w600 : FontWeight.w500,
               color: isSelected
                   ? Colors.white
                   : (isDark ? AppColors.white : AppColors.black),
