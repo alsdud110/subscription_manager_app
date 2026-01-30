@@ -200,7 +200,6 @@ class _HomeScreenState extends State<HomeScreen> {
           },
           calendarStyle: const CalendarStyle(
             outsideDaysVisible: false,
-            // 기본 동그라미 데코레이션 제거하여 커스텀 빌더가 보이게 함
             todayDecoration: BoxDecoration(color: Colors.transparent),
             selectedDecoration: BoxDecoration(color: Colors.transparent),
           ),
@@ -218,7 +217,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 const Icon(Icons.chevron_right_rounded, color: AppColors.gray),
           ),
           calendarBuilders: CalendarBuilders(
-            // 모든 상태에서 사각형 박스 디자인(_buildDayCell)을 사용하도록 고정
             defaultBuilder: (context, date, _) {
               final events = subscriptionProvider.getSubscriptionsForDate(date);
               return _buildDayCell(date, events.cast<Subscription>(), isDark,
@@ -274,12 +272,14 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           const SizedBox(height: 2),
-          // 아이콘 영역 높이를 고정하여 이벤트 유무와 상관없이 숫자의 위치를 유지함
+          // Wrap 위젯을 사용하여 가로 공간 부족 시 다음 줄로 넘김
           SizedBox(
             height: 16,
             child: hasEvents
-                ? Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                ? Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: 1.0, // 아이콘 사이 가로 간격
+                    runSpacing: 1.0, // 줄바꿈 시 세로 간격
                     children: events
                         .take(3)
                         .map((sub) => _buildMiniIcon(sub))
@@ -293,35 +293,32 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildMiniIcon(Subscription sub) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 1),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(3),
-        child: sub.iconPath != null
-            ? Image.asset(
-                sub.iconPath!,
-                width: 14,
-                height: 14,
-                fit: BoxFit.cover,
-              )
-            : Container(
-                width: 14,
-                height: 14,
-                decoration: BoxDecoration(
-                  color: Color(sub.colorValue),
-                  borderRadius: BorderRadius.circular(3),
-                ),
-                child: Center(
-                  child: Text(
-                    sub.serviceIcon,
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 8,
-                        fontWeight: FontWeight.bold),
-                  ),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(3),
+      child: sub.iconPath != null
+          ? Image.asset(
+              sub.iconPath!,
+              width: 14, // 14에서 13으로 미세 축소
+              height: 14,
+              fit: BoxFit.cover,
+            )
+          : Container(
+              width: 14,
+              height: 14,
+              decoration: BoxDecoration(
+                color: Color(sub.colorValue),
+                borderRadius: BorderRadius.circular(3),
+              ),
+              child: Center(
+                child: Text(
+                  sub.serviceIcon,
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 7, // 폰트 사이즈 미세 축소
+                      fontWeight: FontWeight.bold),
                 ),
               ),
-      ),
+            ),
     );
   }
 }
