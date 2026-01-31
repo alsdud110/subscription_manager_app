@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import '../constants/colors.dart';
 import '../constants/app_strings.dart';
@@ -8,6 +9,8 @@ import '../providers/theme_provider.dart';
 import '../providers/language_provider.dart';
 import '../providers/currency_provider.dart';
 import '../providers/subscription_provider.dart';
+import '../providers/notification_provider.dart';
+import '../services/notification_service.dart';
 import '../widgets/banner_ad_widget.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -19,6 +22,7 @@ class SettingsScreen extends StatelessWidget {
     final languageProvider = Provider.of<LanguageProvider>(context);
     final currencyProvider = Provider.of<CurrencyProvider>(context);
     final subscriptionProvider = Provider.of<SubscriptionProvider>(context);
+    final notificationProvider = Provider.of<NotificationProvider>(context);
     final isDark = themeProvider.isDarkMode;
 
     return Scaffold(
@@ -52,6 +56,49 @@ class SettingsScreen extends StatelessWidget {
                 isDark: isDark,
                 trailing: _buildThemeToggle(themeProvider, isDark),
               ),
+            ],
+          ),
+          const SizedBox(height: 16),
+
+          // 알림 섹션
+          _buildSectionHeader(languageProvider.tr('notifications'), isDark),
+          const SizedBox(height: 10),
+          _buildSettingsCard(
+            isDark: isDark,
+            children: [
+              _buildSettingsTile(
+                icon: Icons.notifications_rounded,
+                iconBgColor: AppColors.mint,
+                title: languageProvider.tr('enableNotifications'),
+                isDark: isDark,
+                trailing: _buildNotificationToggle(
+                    notificationProvider, languageProvider, isDark, context),
+              ),
+              if (notificationProvider.isNotificationEnabled) ...[
+                _buildSettingsTile(
+                  icon: Icons.alarm_rounded,
+                  iconBgColor: AppColors.purple,
+                  title: languageProvider.tr('notificationTime'),
+                  value: _getDaysBeforeText(
+                      notificationProvider.daysBeforeNotification,
+                      languageProvider),
+                  isDark: isDark,
+                  onTap: () => _showNotificationTimeDialog(
+                      context, notificationProvider, languageProvider, isDark),
+                ),
+                _buildSettingsTile(
+                  icon: Icons.access_time_rounded,
+                  iconBgColor: AppColors.purpleLight,
+                  title: languageProvider.tr('notificationHour'),
+                  value: languageProvider.isKorean
+                      ? notificationProvider.getFormattedNotificationTimeKo()
+                      : notificationProvider.getFormattedNotificationTime(),
+                  isDark: isDark,
+                  showBorder: false,
+                  onTap: () => _showNotificationHourDialog(
+                      context, notificationProvider, languageProvider, isDark),
+                ),
+              ],
             ],
           ),
           const SizedBox(height: 16),
@@ -469,6 +516,7 @@ class SettingsScreen extends StatelessWidget {
     required bool isDark,
     required bool isDestructive,
     required VoidCallback onTap,
+    bool isPrimary = false,
   }) {
     return Material(
       color: Colors.transparent,
@@ -482,8 +530,12 @@ class SettingsScreen extends StatelessWidget {
                 ? const LinearGradient(
                     colors: [Color(0xFFFF6B6B), Color(0xFFFF8E53)],
                   )
-                : null,
-            color: isDestructive
+                : (isPrimary
+                    ? const LinearGradient(
+                        colors: [AppColors.mint, AppColors.teal],
+                      )
+                    : null),
+            color: (isDestructive || isPrimary)
                 ? null
                 : (isDark ? AppColors.darkOutline : AppColors.lightGray),
             borderRadius: BorderRadius.circular(12),
@@ -494,7 +546,7 @@ class SettingsScreen extends StatelessWidget {
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w600,
-                color: isDestructive
+                color: (isDestructive || isPrimary)
                     ? AppColors.white
                     : (isDark ? AppColors.white : AppColors.black),
               ),
@@ -889,6 +941,500 @@ class SettingsScreen extends StatelessWidget {
                 ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  // 알림 토글 위젯
+  Widget _buildNotificationToggle(
+    NotificationProvider notificationProvider,
+    LanguageProvider languageProvider,
+    bool isDark,
+    BuildContext context,
+  ) {
+    return GestureDetector(
+      onTap: () async {
+        final newValue = !notificationProvider.isNotificationEnabled;
+
+        if (newValue) {
+          // 알림 켤 때 - 권한 확인
+          final notificationService = NotificationService();
+          await notificationService.initialize();
+
+          final hasPermission = await notificationService.checkPermission();
+
+          if (!hasPermission) {
+            // 권한 요청 다이얼로그 표시
+            final shouldRequest = await _showPermissionDialog(
+                context, languageProvider, isDark);
+
+            if (!shouldRequest) {
+              // 사용자가 "나중에" 선택
+              return;
+            }
+
+            // 실제 권한이 부여되었는지 다시 확인
+            final isGranted = await notificationService.checkPermission();
+            if (!isGranted) {
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(languageProvider.tr('notificationPermissionDenied')),
+                    behavior: SnackBarBehavior.floating,
+                    backgroundColor:
+                        isDark ? AppColors.darkSurfaceContainer : AppColors.black,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                  ),
+                );
+              }
+              return;
+            }
+          }
+
+          // 권한 있으면 알림 활성화
+          await notificationProvider.setNotificationEnabled(true);
+
+          // 모든 구독에 대해 알림 스케줄링
+          final subscriptions =
+              Provider.of<SubscriptionProvider>(context, listen: false)
+                  .subscriptions;
+          await notificationService.rescheduleAllNotifications(
+            subscriptions: subscriptions,
+            daysBeforePayment: notificationProvider.daysBeforeNotification,
+            hour: notificationProvider.notificationHour,
+            minute: notificationProvider.notificationMinute,
+          );
+
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(languageProvider.tr('notificationEnabled')),
+                behavior: SnackBarBehavior.floating,
+                backgroundColor: AppColors.teal,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+              ),
+            );
+          }
+        } else {
+          // 알림 끌 때 - 모든 알림 취소
+          await notificationProvider.setNotificationEnabled(false);
+          final notificationService = NotificationService();
+          await notificationService.cancelAllNotifications();
+
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(languageProvider.tr('notificationDisabled')),
+                behavior: SnackBarBehavior.floating,
+                backgroundColor:
+                    isDark ? AppColors.darkSurfaceContainer : AppColors.black,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+              ),
+            );
+          }
+        }
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        width: 52,
+        height: 28,
+        padding: const EdgeInsets.all(3),
+        decoration: BoxDecoration(
+          gradient: notificationProvider.isNotificationEnabled
+              ? const LinearGradient(
+                  colors: [AppColors.mint, AppColors.teal],
+                )
+              : null,
+          color: notificationProvider.isNotificationEnabled
+              ? null
+              : (isDark ? AppColors.darkOutline : AppColors.mediumGray),
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: AnimatedAlign(
+          duration: const Duration(milliseconds: 200),
+          alignment: notificationProvider.isNotificationEnabled
+              ? Alignment.centerRight
+              : Alignment.centerLeft,
+          child: Container(
+            width: 22,
+            height: 22,
+            decoration: BoxDecoration(
+              color: AppColors.white,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.black.withValues(alpha: 0.15),
+                  blurRadius: 4,
+                  offset: const Offset(0, 1),
+                ),
+              ],
+            ),
+            child: Icon(
+              notificationProvider.isNotificationEnabled
+                  ? Icons.notifications_active_rounded
+                  : Icons.notifications_off_rounded,
+              size: 14,
+              color: notificationProvider.isNotificationEnabled
+                  ? AppColors.teal
+                  : AppColors.gray,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // 권한 요청 다이얼로그
+  Future<bool> _showPermissionDialog(
+    BuildContext context,
+    LanguageProvider languageProvider,
+    bool isDark,
+  ) async {
+    final result = await showModalBottomSheet<bool>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.darkSurfaceContainer : AppColors.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: isDark ? AppColors.darkOutline : AppColors.mediumGray,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Container(
+              width: 56,
+              height: 56,
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [AppColors.mint, AppColors.teal],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.mint.withValues(alpha: 0.3),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: const Icon(
+                Icons.notifications_active_rounded,
+                color: AppColors.white,
+                size: 28,
+              ),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              languageProvider.tr('notificationPermissionTitle'),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: isDark ? AppColors.white : AppColors.black,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              languageProvider.tr('notificationPermissionMessage'),
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 14,
+                color: AppColors.gray,
+                height: 1.5,
+              ),
+            ),
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildBottomSheetButton(
+                    text: languageProvider.tr('later'),
+                    isDark: isDark,
+                    isDestructive: false,
+                    onTap: () => Navigator.pop(context, false),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildBottomSheetButton(
+                    text: languageProvider.tr('allow'),
+                    isDark: isDark,
+                    isDestructive: false,
+                    isPrimary: true,
+                    onTap: () async {
+                      final notificationService = NotificationService();
+                      final granted =
+                          await notificationService.requestPermission();
+                      if (context.mounted) {
+                        Navigator.pop(context, granted);
+                      }
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+
+    return result ?? false;
+  }
+
+  // 며칠 전 텍스트 반환
+  String _getDaysBeforeText(int days, LanguageProvider languageProvider) {
+    switch (days) {
+      case 0:
+        return languageProvider.tr('onPaymentDay');
+      case 1:
+        return languageProvider.tr('daysBefore1');
+      case 2:
+        return languageProvider.tr('daysBefore2');
+      case 3:
+        return languageProvider.tr('daysBefore3');
+      case 5:
+        return languageProvider.tr('daysBefore5');
+      case 7:
+        return languageProvider.tr('daysBefore7');
+      default:
+        return '${days}${languageProvider.tr('daysBeforePayment')}';
+    }
+  }
+
+  // 알림 시간 선택 다이얼로그 (몇 일 전)
+  void _showNotificationTimeDialog(
+    BuildContext context,
+    NotificationProvider notificationProvider,
+    LanguageProvider languageProvider,
+    bool isDark,
+  ) {
+    final options = [
+      (0, languageProvider.tr('onPaymentDay')),
+      (1, languageProvider.tr('daysBefore1')),
+      (2, languageProvider.tr('daysBefore2')),
+      (3, languageProvider.tr('daysBefore3')),
+      (5, languageProvider.tr('daysBefore5')),
+      (7, languageProvider.tr('daysBefore7')),
+    ];
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => Container(
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.darkSurfaceContainer : AppColors.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
+        child: SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: isDark ? AppColors.darkOutline : AppColors.mediumGray,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 24),
+              Text(
+                languageProvider.tr('selectNotificationTime'),
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: isDark ? AppColors.white : AppColors.black,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Flexible(
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: options.map((option) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: _buildSelectionItem(
+                          title: option.$2,
+                          subtitle: '',
+                          isSelected:
+                              notificationProvider.daysBeforeNotification == option.$1,
+                          isDark: isDark,
+                          onTap: () async {
+                            // async 작업 전에 필요한 데이터 미리 가져오기
+                            final subscriptions =
+                                Provider.of<SubscriptionProvider>(context,
+                                        listen: false)
+                                    .subscriptions;
+
+                            await notificationProvider
+                                .setDaysBeforeNotification(option.$1);
+
+                            // 알림 재스케줄링
+                            if (notificationProvider.isNotificationEnabled) {
+                              final notificationService = NotificationService();
+                              await notificationService.rescheduleAllNotifications(
+                                subscriptions: subscriptions,
+                                daysBeforePayment: option.$1,
+                                hour: notificationProvider.notificationHour,
+                                minute: notificationProvider.notificationMinute,
+                              );
+                            }
+
+                            if (context.mounted) {
+                              Navigator.pop(context);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                      languageProvider.tr('notificationSettingsUpdated')),
+                                  behavior: SnackBarBehavior.floating,
+                                  backgroundColor: AppColors.teal,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10)),
+                                ),
+                              );
+                            }
+                          },
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // 알림 시간대 선택 다이얼로그
+  void _showNotificationHourDialog(
+    BuildContext context,
+    NotificationProvider notificationProvider,
+    LanguageProvider languageProvider,
+    bool isDark,
+  ) {
+    DateTime tempTime = DateTime(
+      2024,
+      1,
+      1,
+      notificationProvider.notificationHour,
+      notificationProvider.notificationMinute,
+    );
+
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) => Container(
+        height: 300,
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.darkSurfaceContainer : AppColors.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(
+                    color: isDark ? AppColors.darkOutline : AppColors.mediumGray,
+                    width: 0.5,
+                  ),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  CupertinoButton(
+                    padding: EdgeInsets.zero,
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(
+                      languageProvider.tr('cancel'),
+                      style: TextStyle(
+                        color: isDark ? AppColors.gray : AppColors.gray,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                  CupertinoButton(
+                    padding: EdgeInsets.zero,
+                    onPressed: () async {
+                      await notificationProvider.setNotificationTime(
+                        tempTime.hour,
+                        tempTime.minute,
+                      );
+
+                      // 알림 재스케줄링
+                      if (notificationProvider.isNotificationEnabled) {
+                        final notificationService = NotificationService();
+                        final subscriptions =
+                            Provider.of<SubscriptionProvider>(context,
+                                    listen: false)
+                                .subscriptions;
+                        await notificationService.rescheduleAllNotifications(
+                          subscriptions: subscriptions,
+                          daysBeforePayment:
+                              notificationProvider.daysBeforeNotification,
+                          hour: tempTime.hour,
+                          minute: tempTime.minute,
+                        );
+                      }
+
+                      if (context.mounted) {
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(languageProvider
+                                .tr('notificationSettingsUpdated')),
+                            behavior: SnackBarBehavior.floating,
+                            backgroundColor: AppColors.teal,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10)),
+                          ),
+                        );
+                      }
+                    },
+                    child: Text(
+                      languageProvider.tr('save'),
+                      style: const TextStyle(
+                        color: AppColors.purple,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: CupertinoDatePicker(
+                mode: CupertinoDatePickerMode.time,
+                initialDateTime: tempTime,
+                use24hFormat: false,
+                onDateTimeChanged: (DateTime newTime) {
+                  tempTime = newTime;
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );

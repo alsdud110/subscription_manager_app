@@ -10,10 +10,12 @@ import 'providers/theme_provider.dart';
 import 'providers/subscription_provider.dart';
 import 'providers/language_provider.dart';
 import 'providers/currency_provider.dart';
+import 'providers/notification_provider.dart';
 import 'screens/splash_screen.dart';
 import 'screens/home_screen.dart';
 import 'utils/page_transitions.dart';
 import 'services/app_version_service.dart';
+import 'services/notification_service.dart';
 import 'widgets/update_dialog.dart';
 
 // GlobalKey for navigation
@@ -41,6 +43,14 @@ void main() async {
     print('AdMob 초기화 완료: ${initializationStatus.adapterStatuses}');
   } catch (e) {
     print('AdMob 초기화 실패: $e');
+  }
+
+  // 알림 서비스 초기화
+  try {
+    await NotificationService().initialize();
+    print('알림 서비스 초기화 완료');
+  } catch (e) {
+    print('알림 서비스 초기화 실패: $e');
   }
 
   runApp(const MyApp());
@@ -142,6 +152,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         ChangeNotifierProvider(create: (_) => SubscriptionProvider()),
         ChangeNotifierProvider(create: (_) => LanguageProvider()),
         ChangeNotifierProvider(create: (_) => CurrencyProvider()),
+        ChangeNotifierProvider(create: (_) => NotificationProvider()),
       ],
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, child) {

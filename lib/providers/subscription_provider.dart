@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/subscription.dart';
 import '../services/storage_service.dart';
+import '../services/notification_service.dart';
 
 class SubscriptionProvider extends ChangeNotifier {
   List<Subscription> _subscriptions = [];
   final StorageService _storageService = StorageService();
+  final NotificationService _notificationService = NotificationService();
   bool _isLoading = true;
 
   List<Subscription> get subscriptions => _subscriptions;
@@ -27,19 +30,53 @@ class SubscriptionProvider extends ChangeNotifier {
   Future<void> addSubscription(Subscription subscription) async {
     _subscriptions.add(subscription);
     await _storageService.saveSubscriptions(_subscriptions);
+
+    // 알림이 활성화되어 있으면 스케줄링
+    await _scheduleNotificationForSubscription(subscription);
+
     notifyListeners();
   }
 
   Future<void> deleteSubscription(String id) async {
+    // 알림 취소
+    await _notificationService.cancelNotification(id);
+
     _subscriptions.removeWhere((sub) => sub.id == id);
     await _storageService.saveSubscriptions(_subscriptions);
     notifyListeners();
   }
 
   Future<void> clearAllSubscriptions() async {
+    // 모든 알림 취소
+    await _notificationService.cancelAllNotifications();
+
     _subscriptions.clear();
     await _storageService.saveSubscriptions(_subscriptions);
     notifyListeners();
+  }
+
+  // 구독에 대한 알림 스케줄링 (알림 설정 확인)
+  Future<void> _scheduleNotificationForSubscription(
+      Subscription subscription) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final isNotificationEnabled = prefs.getBool('notification_enabled') ?? false;
+
+      if (!isNotificationEnabled) return;
+
+      final daysBeforeNotification = prefs.getInt('days_before_notification') ?? 1;
+      final notificationHour = prefs.getInt('notification_hour') ?? 15;
+      final notificationMinute = prefs.getInt('notification_minute') ?? 0;
+
+      await _notificationService.scheduleNotification(
+        subscription: subscription,
+        daysBeforePayment: daysBeforeNotification,
+        hour: notificationHour,
+        minute: notificationMinute,
+      );
+    } catch (e) {
+      print('알림 스케줄링 실패: $e');
+    }
   }
 
   int get subscriptionCount => _subscriptions.length;
