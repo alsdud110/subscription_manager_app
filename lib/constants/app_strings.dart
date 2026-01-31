@@ -17,8 +17,8 @@ class AppStrings {
   // Korean strings (default)
   static const Map<String, String> _koreanStrings = {
     // App
-    'appTitle': '구독 관리',
-    'subscriptionManager': '구독 관리',
+    'appTitle': '구독잇',
+    'subscriptionManager': '구독잇',
 
     // Home Screen
     'noSubscriptions': '구독 없음',
@@ -159,8 +159,8 @@ class AppStrings {
   // English strings
   static const Map<String, String> _englishStrings = {
     // App
-    'appTitle': 'Subscription Manager',
-    'subscriptionManager': 'Subscription Manager',
+    'appTitle': 'Subit',
+    'subscriptionManager': 'Subit',
 
     // Home Screen
     'noSubscriptions': 'No subscriptions',

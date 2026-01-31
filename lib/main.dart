@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, child) {
           return MaterialApp(
-            title: 'Subscription Manager',
+            title: 'Subit',
             debugShowCheckedModeBanner: false,
             theme: themeProvider.themeData,
             themeAnimationDuration: const Duration(milliseconds: 400),

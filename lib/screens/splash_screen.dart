@@ -91,7 +91,7 @@ class _SplashScreenState extends State<SplashScreen>
               ),
               const SizedBox(height: 32),
               Text(
-                isKorean ? '구독관리' : 'Subscription Manager',
+                isKorean ? '구독잇' : 'Subit',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.w600,
