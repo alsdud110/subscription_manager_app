@@ -602,10 +602,11 @@ class SettingsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             _buildSelectionItem(
-              title: '₩ KRW',
+              title: 'KRW',
               subtitle: languageProvider.tr('krwFull'),
               isSelected: currencyProvider.isKrwBase,
               isDark: isDark,
+              currencySymbol: '₩',
               onTap: () {
                 currencyProvider.setBaseCurrency(Currency.krw);
                 Navigator.pop(context);
@@ -613,10 +614,11 @@ class SettingsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             _buildSelectionItem(
-              title: '\$ USD',
+              title: 'USD',
               subtitle: languageProvider.tr('usdFull'),
               isSelected: currencyProvider.isUsdBase,
               isDark: isDark,
+              currencySymbol: '\$',
               onTap: () {
                 currencyProvider.setBaseCurrency(Currency.usd);
                 Navigator.pop(context);
@@ -784,7 +786,12 @@ class SettingsScreen extends StatelessWidget {
     required bool isSelected,
     required bool isDark,
     required VoidCallback onTap,
+    String? currencySymbol,
   }) {
+    final titleColor = isSelected
+        ? AppColors.white
+        : (isDark ? AppColors.white : AppColors.black);
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -821,16 +828,36 @@ class SettingsScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      title,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: isSelected
-                            ? AppColors.white
-                            : (isDark ? AppColors.white : AppColors.black),
-                      ),
-                    ),
+                    currencySymbol != null
+                        ? Row(
+                            children: [
+                              Text(
+                                currencySymbol,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  fontFamily: 'Apple SD Gothic Neo',
+                                  color: titleColor,
+                                ),
+                              ),
+                              Text(
+                                ' $title',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: titleColor,
+                                ),
+                              ),
+                            ],
+                          )
+                        : Text(
+                            title,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: titleColor,
+                            ),
+                          ),
                     const SizedBox(height: 2),
                     Text(
                       subtitle,
