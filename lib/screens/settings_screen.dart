@@ -1005,6 +1005,7 @@ class SettingsScreen extends StatelessWidget {
             daysBeforePayment: notificationProvider.daysBeforeNotification,
             hour: notificationProvider.notificationHour,
             minute: notificationProvider.notificationMinute,
+            languageCode: languageProvider.languageCode,
           );
 
           if (context.mounted) {
@@ -1295,6 +1296,7 @@ class SettingsScreen extends StatelessWidget {
                                 daysBeforePayment: option.$1,
                                 hour: notificationProvider.notificationHour,
                                 minute: notificationProvider.notificationMinute,
+                                languageCode: languageProvider.languageCode,
                               );
                             }
 
@@ -1395,6 +1397,7 @@ class SettingsScreen extends StatelessWidget {
                               notificationProvider.daysBeforeNotification,
                           hour: tempTime.hour,
                           minute: tempTime.minute,
+                          languageCode: languageProvider.languageCode,
                         );
                       }
 

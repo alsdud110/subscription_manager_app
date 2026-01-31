@@ -67,12 +67,14 @@ class SubscriptionProvider extends ChangeNotifier {
       final daysBeforeNotification = prefs.getInt('days_before_notification') ?? 1;
       final notificationHour = prefs.getInt('notification_hour') ?? 15;
       final notificationMinute = prefs.getInt('notification_minute') ?? 0;
+      final languageCode = prefs.getString('language') ?? 'ko';
 
       await _notificationService.scheduleNotification(
         subscription: subscription,
         daysBeforePayment: daysBeforeNotification,
         hour: notificationHour,
         minute: notificationMinute,
+        languageCode: languageCode,
       );
     } catch (e) {
       print('알림 스케줄링 실패: $e');

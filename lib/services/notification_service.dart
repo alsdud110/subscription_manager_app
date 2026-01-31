@@ -4,6 +4,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest_all.dart' as tz;
 import '../models/subscription.dart';
+import '../constants/app_strings.dart';
 
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
@@ -96,6 +97,7 @@ class NotificationService {
     required int daysBeforePayment,
     required int hour,
     required int minute,
+    required String languageCode,
   }) async {
     if (!_isInitialized) {
       await initialize();
@@ -103,25 +105,26 @@ class NotificationService {
 
     // 다음 결제일 계산
     final nextPaymentDate = _getNextPaymentDate(subscription);
-    if (nextPaymentDate == null) return;
+    if (nextPaymentDate == null) {
+      print('❌ [알림] ${subscription.serviceName}: 다음 결제일을 계산할 수 없음');
+      return;
+    }
+
+    print('📅 [알림] ${subscription.serviceName}: 다음 결제일 = $nextPaymentDate');
 
     // 알림 날짜 계산 (결제일 N일 전)
     final notificationDate =
         nextPaymentDate.subtract(Duration(days: daysBeforePayment));
 
     // 알림 시간 설정
-    // final scheduledDate = tz.TZDateTime(
-    //   tz.local,
-    //   notificationDate.year,
-    //   notificationDate.month,
-    //   notificationDate.day,
-    //   hour,
-    //   minute,
-    // );
-
-    // 테스트용: 10초 후 알림
-    final scheduledDate =
-        tz.TZDateTime.now(tz.local).add(const Duration(seconds: 10));
+    final scheduledDate = tz.TZDateTime(
+      tz.local,
+      notificationDate.year,
+      notificationDate.month,
+      notificationDate.day,
+      hour,
+      minute,
+    );
 
     // 과거 시간이면 스케줄링 안 함
     if (scheduledDate.isBefore(tz.TZDateTime.now(tz.local))) {
@@ -149,15 +152,17 @@ class NotificationService {
     );
 
     // 알림 스케줄링
+    final String appName = AppStrings.get('appTitle', languageCode);
     final String title;
     final String body;
 
     if (daysBeforePayment == 0) {
-      title = '${subscription.serviceName} 결제일';
-      body = '오늘 ${subscription.getFormattedAmount()} 결제됩니다';
+      title = '[$appName] ${subscription.serviceName} 결제일';
+      body = '오늘 ${subscription.getFormattedAmount()} 결제 예정입니다.';
     } else {
-      title = '${subscription.serviceName} 결제 예정';
-      body = '$daysBeforePayment일 후 ${subscription.getFormattedAmount()} 결제됩니다';
+      title = '[$appName] ${subscription.serviceName} 결제 예정';
+      body =
+          '$daysBeforePayment일 후 ${subscription.getFormattedAmount()} 결제 예정입니다.';
     }
 
     await _notifications.zonedSchedule(
@@ -249,6 +254,7 @@ class NotificationService {
     required int daysBeforePayment,
     required int hour,
     required int minute,
+    required String languageCode,
   }) async {
     // 기존 알림 모두 취소
     await cancelAllNotifications();
@@ -260,6 +266,7 @@ class NotificationService {
         daysBeforePayment: daysBeforePayment,
         hour: hour,
         minute: minute,
+        languageCode: languageCode,
       );
     }
   }
