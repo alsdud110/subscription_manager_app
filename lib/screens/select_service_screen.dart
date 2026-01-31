@@ -7,7 +7,9 @@ import '../utils/page_transitions.dart';
 import 'add_subscription_screen.dart';
 
 class SelectServiceScreen extends StatefulWidget {
-  const SelectServiceScreen({super.key});
+  final bool isFirstLaunch;
+
+  const SelectServiceScreen({super.key, this.isFirstLaunch = false});
 
   @override
   State<SelectServiceScreen> createState() => _SelectServiceScreenState();
@@ -50,21 +52,41 @@ class _SelectServiceScreenState extends State<SelectServiceScreen> {
             color: isDark ? AppColors.white : AppColors.black,
           ),
         ),
-        leading: IconButton(
-          onPressed: () => Navigator.pop(context),
-          icon: Container(
-            padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(
-              color: isDark ? AppColors.darkSurfaceContainer : AppColors.lightGray,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(
-              Icons.arrow_back_ios_new_rounded,
-              color: isDark ? AppColors.white : AppColors.black,
-              size: 16,
-            ),
-          ),
-        ),
+        leading: widget.isFirstLaunch
+            ? null
+            : IconButton(
+                onPressed: () => Navigator.pop(context),
+                icon: Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? AppColors.darkSurfaceContainer
+                        : AppColors.lightGray,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(
+                    Icons.arrow_back_ios_new_rounded,
+                    color: isDark ? AppColors.white : AppColors.black,
+                    size: 16,
+                  ),
+                ),
+              ),
+        actions: widget.isFirstLaunch
+            ? [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pushReplacementNamed('/home');
+                  },
+                  child: Text(
+                    languageProvider.tr('skipForNow'),
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: AppColors.gray,
+                    ),
+                  ),
+                ),
+              ]
+            : null,
       ),
       body: SafeArea(
         top: false,

@@ -22,6 +22,7 @@ class AppStrings {
 
     // Home Screen
     'noSubscriptions': '구독 없음',
+    'skipForNow': '나중에 하기',
 
     // Settings Screen
     'settings': '설정',
@@ -164,6 +165,7 @@ class AppStrings {
 
     // Home Screen
     'noSubscriptions': 'No subscriptions',
+    'skipForNow': 'Later',
 
     // Settings Screen
     'settings': 'Settings',
