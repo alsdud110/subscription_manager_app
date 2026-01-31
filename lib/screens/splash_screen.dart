@@ -44,23 +44,34 @@ class _SplashScreenState extends State<SplashScreen>
 
     _controller.forward();
 
-    Timer(const Duration(seconds: 2), () {
-      if (mounted) {
-        final subscriptionProvider =
-            Provider.of<SubscriptionProvider>(context, listen: false);
+    _navigateAfterLoading();
+  }
 
-        if (subscriptionProvider.subscriptions.isEmpty) {
-          // 구독이 없으면 서비스 선택 화면으로 이동
-          Navigator.of(context).pushReplacement(
-            FadeSlidePageRoute(
-              page: const SelectServiceScreen(isFirstLaunch: true),
-            ),
-          );
-        } else {
-          Navigator.of(context).pushReplacementNamed('/home');
-        }
-      }
-    });
+  Future<void> _navigateAfterLoading() async {
+    // 최소 2초 대기 (애니메이션 시간)
+    await Future.delayed(const Duration(seconds: 2));
+
+    if (!mounted) return;
+
+    final subscriptionProvider =
+        Provider.of<SubscriptionProvider>(context, listen: false);
+
+    // 로딩이 완료될 때까지 대기
+    while (subscriptionProvider.isLoading) {
+      await Future.delayed(const Duration(milliseconds: 100));
+      if (!mounted) return;
+    }
+
+    if (subscriptionProvider.subscriptions.isEmpty) {
+      // 구독이 없으면 서비스 선택 화면으로 이동
+      Navigator.of(context).pushReplacement(
+        FadeSlidePageRoute(
+          page: const SelectServiceScreen(isFirstLaunch: true),
+        ),
+      );
+    } else {
+      Navigator.of(context).pushReplacementNamed('/home');
+    }
   }
 
   @override

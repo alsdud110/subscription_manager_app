@@ -78,8 +78,51 @@ class SubscriptionProvider extends ChangeNotifier {
         }
       }
     }
-    
+
     return total;
+  }
+
+  // 이번 주에 결제가 있는 구독 목록 반환
+  List<Subscription> getWeeklySubscriptions() {
+    final now = DateTime.now();
+    final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
+    final Set<String> addedIds = {};
+    final List<Subscription> result = [];
+
+    for (int i = 0; i < 7; i++) {
+      final date = startOfWeek.add(Duration(days: i));
+      final subs = getSubscriptionsForDate(date);
+
+      for (var sub in subs) {
+        if (!addedIds.contains(sub.id)) {
+          addedIds.add(sub.id);
+          result.add(sub);
+        }
+      }
+    }
+
+    return result;
+  }
+
+  // 특정 월에 결제가 있는 구독 목록 반환
+  List<Subscription> getMonthlySubscriptions(DateTime month) {
+    final daysInMonth = DateTime(month.year, month.month + 1, 0).day;
+    final Set<String> addedIds = {};
+    final List<Subscription> result = [];
+
+    for (int day = 1; day <= daysInMonth; day++) {
+      final date = DateTime(month.year, month.month, day);
+      final subs = getSubscriptionsForDate(date);
+
+      for (var sub in subs) {
+        if (!addedIds.contains(sub.id)) {
+          addedIds.add(sub.id);
+          result.add(sub);
+        }
+      }
+    }
+
+    return result;
   }
 
   double getMonthlyTotal(Currency currency) {

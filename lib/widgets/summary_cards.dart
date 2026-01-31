@@ -150,13 +150,20 @@ class SummaryCards extends StatelessWidget {
                       decimalDigits: decimalDigits,
                       isDark: isDark,
                       noSubscriptionsText: languageProvider.tr('noSubscriptions'),
-                      onTap: () => _showDetailSheet(
-                        context,
-                        "${languageProvider.tr('weeklyTotal')} ${_getWeeklyRangeText(languageProvider)}",
-                        subscriptionProvider.subscriptions,
-                        isDark,
-                        languageProvider,
-                      ),
+                      onTap: () {
+                        final weeklySubs = subscriptionProvider.getWeeklySubscriptions();
+                        if (weeklySubs.isEmpty) {
+                          _showToast(context, languageProvider.tr('noSubscriptions'), isDark);
+                        } else {
+                          _showDetailSheet(
+                            context,
+                            "${languageProvider.tr('weeklyTotal')} ${_getWeeklyRangeText(languageProvider)}",
+                            weeklySubs,
+                            isDark,
+                            languageProvider,
+                          );
+                        }
+                      },
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -170,13 +177,20 @@ class SummaryCards extends StatelessWidget {
                       decimalDigits: decimalDigits,
                       isDark: isDark,
                       noSubscriptionsText: languageProvider.tr('noSubscriptions'),
-                      onTap: () => _showDetailSheet(
-                        context,
-                        "${languageProvider.tr('monthlyTotal')} ${_getMonthText(focusedMonth, languageProvider)}",
-                        subscriptionProvider.subscriptions,
-                        isDark,
-                        languageProvider,
-                      ),
+                      onTap: () {
+                        final monthlySubs = subscriptionProvider.getMonthlySubscriptions(focusedMonth);
+                        if (monthlySubs.isEmpty) {
+                          _showToast(context, languageProvider.tr('noSubscriptions'), isDark);
+                        } else {
+                          _showDetailSheet(
+                            context,
+                            "${languageProvider.tr('monthlyTotal')} ${_getMonthText(focusedMonth, languageProvider)}",
+                            monthlySubs,
+                            isDark,
+                            languageProvider,
+                          );
+                        }
+                      },
                     ),
                   ),
                 ],
@@ -193,13 +207,20 @@ class SummaryCards extends StatelessWidget {
                   decimalDigits: decimalDigits,
                   isDark: isDark,
                   noSubscriptionsText: languageProvider.tr('noSubscriptions'),
-                  onTap: () => _showDetailSheet(
-                    context,
-                    "${languageProvider.tr('monthlyTotal')} ${_getMonthText(focusedMonth, languageProvider)}",
-                    subscriptionProvider.subscriptions,
-                    isDark,
-                    languageProvider,
-                  ),
+                  onTap: () {
+                    final monthlySubs = subscriptionProvider.getMonthlySubscriptions(focusedMonth);
+                    if (monthlySubs.isEmpty) {
+                      _showToast(context, languageProvider.tr('noSubscriptions'), isDark);
+                    } else {
+                      _showDetailSheet(
+                        context,
+                        "${languageProvider.tr('monthlyTotal')} ${_getMonthText(focusedMonth, languageProvider)}",
+                        monthlySubs,
+                        isDark,
+                        languageProvider,
+                      );
+                    }
+                  },
                 ),
               ),
       ),
@@ -295,6 +316,43 @@ class SummaryCards extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  // FAB 버튼과 같은 높이에 토스트 표시
+  void _showToast(BuildContext context, String message, bool isDark) {
+    final overlay = Overlay.of(context);
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+    // 배너 높이(50) + 하단 패딩 + FAB 중심 맞추기
+    final toastBottom = 50.0 + bottomPadding + 36.0;
+
+    late OverlayEntry overlayEntry;
+    overlayEntry = OverlayEntry(
+      builder: (context) => Positioned(
+        bottom: toastBottom,
+        left: 16,
+        right: 80,
+        child: Material(
+          color: Colors.transparent,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            decoration: BoxDecoration(
+              color: isDark ? AppColors.darkSurfaceContainer : AppColors.black,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Text(
+              message,
+              style: const TextStyle(color: Colors.white, fontSize: 14),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    overlay.insert(overlayEntry);
+
+    Future.delayed(const Duration(milliseconds: 1500), () {
+      overlayEntry.remove();
+    });
   }
 
   // 배경 터치 시 닫히도록 개선된 바텀 시트
