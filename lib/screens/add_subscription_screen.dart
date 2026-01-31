@@ -35,7 +35,9 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
   late int _month;
   DateTime _startDate = DateTime.now();
   DateTime? _endDate;
+  bool _hasStartDate = false;
   bool _hasEndDate = false;
+  bool _billingCycleSelected = false;
 
   bool _initialScrollDone = false;
 
@@ -48,28 +50,23 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
     } else {
       _selectedColorValue = AppColors.subscriptionColors[0];
     }
-    // 결제 시작일에 맞춰 결제 주기 옵션 초기화
-    _updateBillingOptionsFromDate(_startDate);
-  }
-
-  void _updateBillingOptionsFromDate(DateTime date) {
-    _dayOfMonth = date.day;
-    _month = date.month;
-    _dayOfWeek = date.weekday; // 1=월요일, 7=일요일
+    // 결제 주기 옵션 첫 번째 값으로 초기화
+    _dayOfMonth = 1;
+    _month = 1;
+    _dayOfWeek = 1; // 월요일
   }
 
   void _onStartDateChanged(DateTime date) {
     setState(() {
       _startDate = date;
-      _updateBillingOptionsFromDate(date);
     });
-    _scrollToSelectedDay();
-    _scrollToSelectedWeekday();
-    _scrollToSelectedMonth();
   }
 
   void _onBillingCycleChanged(BillingCycle cycle) {
-    setState(() => _billingCycle = cycle);
+    setState(() {
+      _billingCycle = cycle;
+      _billingCycleSelected = true;
+    });
     // 결제 주기에 따라 해당 스크롤러로 스크롤
     switch (cycle) {
       case BillingCycle.weekly:
@@ -171,22 +168,46 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
             const SizedBox(height: 12),
             _buildPriceRow(isDark, languageProvider),
             const SizedBox(height: 24),
-            _buildSectionTitle(languageProvider.tr('startDate'), isDark),
-            const SizedBox(height: 12),
-            _buildDateSelector(
-              isDark,
-              languageProvider,
-              _startDate,
-              _onStartDateChanged,
+            Row(
+              children: [
+                _buildSectionTitle(languageProvider.tr('billingCycle'), isDark),
+                if (!_billingCycleSelected) ...[
+                  const SizedBox(width: 8),
+                  Text(
+                    '- ${languageProvider.tr('selectBillingCycle')}',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: AppColors.purple,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ],
             ),
-            const SizedBox(height: 24),
-            _buildEndDateSection(isDark, languageProvider),
-            const SizedBox(height: 24),
-            _buildSectionTitle(languageProvider.tr('billingCycle'), isDark),
             const SizedBox(height: 12),
             _buildBillingCycleSelector(isDark, languageProvider),
-            const SizedBox(height: 20),
-            _buildBillingCycleOptions(isDark, languageProvider),
+            // 결제 주기 선택 후 결제일 옵션만 fade in
+            AnimatedSize(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeOutCubic,
+              child: AnimatedOpacity(
+                duration: const Duration(milliseconds: 300),
+                opacity: _billingCycleSelected ? 1.0 : 0.0,
+                child: _billingCycleSelected
+                    ? Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 20),
+                          _buildBillingCycleOptions(isDark, languageProvider),
+                        ],
+                      )
+                    : const SizedBox.shrink(),
+              ),
+            ),
+            const SizedBox(height: 24),
+            _buildStartDateSection(isDark, languageProvider),
+            const SizedBox(height: 24),
+            _buildEndDateSection(isDark, languageProvider),
             const SizedBox(height: 32),
             _buildSubmitButton(context, isDark, languageProvider),
             const SizedBox(height: 16),
@@ -664,6 +685,47 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
     return '${months[date.month - 1]} ${date.day}, ${date.year}';
   }
 
+  Widget _buildStartDateSection(bool isDark, LanguageProvider languageProvider) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            _buildSectionTitle(languageProvider.tr('startDate'), isDark),
+            const SizedBox(width: 8),
+            Text(
+              '(${languageProvider.tr('optional')})',
+              style: TextStyle(
+                fontSize: 13,
+                color: isDark ? AppColors.gray : AppColors.gray,
+              ),
+            ),
+            const Spacer(),
+            Switch(
+              value: _hasStartDate,
+              onChanged: (value) {
+                setState(() {
+                  _hasStartDate = value;
+                });
+              },
+              activeTrackColor: AppColors.purple,
+              activeThumbColor: AppColors.white,
+            ),
+          ],
+        ),
+        if (_hasStartDate) ...[
+          const SizedBox(height: 12),
+          _buildDateSelector(
+            isDark,
+            languageProvider,
+            _startDate,
+            _onStartDateChanged,
+          ),
+        ],
+      ],
+    );
+  }
+
   Widget _buildEndDateSection(bool isDark, LanguageProvider languageProvider) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -721,7 +783,7 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
       spacing: 8,
       runSpacing: 8,
       children: cycles.map((cycle) {
-        final isSelected = _billingCycle == cycle.$1;
+        final isSelected = _billingCycleSelected && _billingCycle == cycle.$1;
         return GestureDetector(
           onTap: () => _onBillingCycleChanged(cycle.$1),
           child: Container(
@@ -1187,7 +1249,7 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
             : null,
         createdAt: DateTime.now(),
         colorValue: _selectedColorValue,
-        startDate: _startDate,
+        startDate: _hasStartDate ? _startDate : null,
         endDate: _hasEndDate ? _endDate : null,
       );
 

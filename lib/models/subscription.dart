@@ -76,6 +76,24 @@ class Subscription {
   }
 
   bool occursOnDate(DateTime date) {
+    // startDate가 있으면 그 이전 날짜는 제외
+    if (startDate != null) {
+      final startDateOnly = DateTime(startDate!.year, startDate!.month, startDate!.day);
+      final dateOnly = DateTime(date.year, date.month, date.day);
+      if (dateOnly.isBefore(startDateOnly)) {
+        return false;
+      }
+    }
+
+    // endDate가 있으면 그 이후 날짜는 제외
+    if (endDate != null) {
+      final endDateOnly = DateTime(endDate!.year, endDate!.month, endDate!.day);
+      final dateOnly = DateTime(date.year, date.month, date.day);
+      if (dateOnly.isAfter(endDateOnly)) {
+        return false;
+      }
+    }
+
     switch (billingCycle) {
       case BillingCycle.once:
         return month != null &&
