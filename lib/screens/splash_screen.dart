@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'dart:async';
 import 'dart:ui' as ui;
 import '../constants/colors.dart';
+import '../providers/subscription_provider.dart';
+import '../utils/page_transitions.dart';
+import 'select_service_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -42,7 +46,19 @@ class _SplashScreenState extends State<SplashScreen>
 
     Timer(const Duration(seconds: 2), () {
       if (mounted) {
-        Navigator.of(context).pushReplacementNamed('/home');
+        final subscriptionProvider =
+            Provider.of<SubscriptionProvider>(context, listen: false);
+
+        if (subscriptionProvider.subscriptions.isEmpty) {
+          // 구독이 없으면 서비스 선택 화면으로 이동
+          Navigator.of(context).pushReplacement(
+            FadeSlidePageRoute(
+              page: const SelectServiceScreen(isFirstLaunch: true),
+            ),
+          );
+        } else {
+          Navigator.of(context).pushReplacementNamed('/home');
+        }
       }
     });
   }
@@ -89,7 +105,7 @@ class _SplashScreenState extends State<SplashScreen>
                   fit: BoxFit.cover,
                 ),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 10),
               Text(
                 isKorean ? '구독잇' : 'Subit',
                 style: TextStyle(
