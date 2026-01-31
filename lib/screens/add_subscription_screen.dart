@@ -145,15 +145,17 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final languageProvider = Provider.of<LanguageProvider>(context);
 
-    return Scaffold(
-      backgroundColor: isDark ? AppColors.black : AppColors.white,
-      appBar: _buildAppBar(context, isDark, languageProvider),
-      bottomNavigationBar: const BannerAdWidget(),
-      body: Form(
-        key: _formKey,
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        backgroundColor: isDark ? AppColors.black : AppColors.white,
+        appBar: _buildAppBar(context, isDark, languageProvider),
+        bottomNavigationBar: const BannerAdWidget(),
+        body: Form(
+          key: _formKey,
+          child: ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
             _buildServiceHeader(isDark),
             const SizedBox(height: 24),
             if (widget.selectedService == null) ...[
@@ -215,6 +217,7 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
             const SizedBox(height: 16),
           ],
         ),
+      ),
       ),
     );
   }
@@ -528,6 +531,7 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
         fontSize: 16,
       ),
       keyboardType: TextInputType.number,
+      textInputAction: TextInputAction.done,
       validator: (value) {
         if (value == null || value.isEmpty) {
           return languageProvider.tr('pleaseEnterAmount');
