@@ -8,7 +8,9 @@ import '../providers/language_provider.dart';
 import '../providers/currency_provider.dart';
 
 class SummaryCards extends StatelessWidget {
-  const SummaryCards({super.key});
+  final DateTime focusedMonth;
+
+  const SummaryCards({super.key, required this.focusedMonth});
 
   // 금액 포맷 로직
   String _getFormattedAmount(
@@ -57,12 +59,17 @@ class SummaryCards extends StatelessWidget {
     return "(${DateFormat(format).format(monday)} ~ ${DateFormat(format).format(sunday)})";
   }
 
-  // 이번 달 텍스트 (예: 1월)
-  String _getCurrentMonthText(LanguageProvider lp) {
-    DateTime now = DateTime.now();
+  // 선택된 달 텍스트 (예: 1월)
+  String _getMonthText(DateTime month, LanguageProvider lp) {
     return lp.isKorean
-        ? "(${now.month}월)"
-        : "(${DateFormat('MMM').format(now)})";
+        ? "(${month.month}월)"
+        : "(${DateFormat('MMM').format(month)})";
+  }
+
+  // 현재 월인지 확인
+  bool _isCurrentMonth(DateTime month) {
+    final now = DateTime.now();
+    return month.year == now.year && month.month == now.month;
   }
 
   @override
@@ -72,76 +79,129 @@ class SummaryCards extends StatelessWidget {
     final currencyProvider = Provider.of<CurrencyProvider>(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final weeklyKrw = subscriptionProvider.getWeeklyTotal(Currency.krw);
-    final weeklyUsd = subscriptionProvider.getWeeklyTotal(Currency.usd);
-    final monthlyKrw = subscriptionProvider.getMonthlyTotal(Currency.krw);
-    final monthlyUsd = subscriptionProvider.getMonthlyTotal(Currency.usd);
+    final isCurrentMonth = _isCurrentMonth(focusedMonth);
 
-    double weeklyTotal;
-    double monthlyTotal;
+    // 선택된 월의 합계 계산
+    final selectedMonthKrw = subscriptionProvider.getMonthlyTotalForMonth(focusedMonth, Currency.krw);
+    final selectedMonthUsd = subscriptionProvider.getMonthlyTotalForMonth(focusedMonth, Currency.usd);
+
     String currencySymbol;
     int decimalDigits;
+    double monthlyTotal;
 
     if (currencyProvider.isKrwBase) {
-      weeklyTotal = weeklyKrw +
-          currencyProvider.convertToBaseCurrency(weeklyUsd, Currency.usd);
-      monthlyTotal = monthlyKrw +
-          currencyProvider.convertToBaseCurrency(monthlyUsd, Currency.usd);
+      monthlyTotal = selectedMonthKrw +
+          currencyProvider.convertToBaseCurrency(selectedMonthUsd, Currency.usd);
       currencySymbol = '₩';
       decimalDigits = 0;
     } else {
-      weeklyTotal = weeklyUsd +
-          currencyProvider.convertToBaseCurrency(weeklyKrw, Currency.krw);
-      monthlyTotal = monthlyUsd +
-          currencyProvider.convertToBaseCurrency(monthlyKrw, Currency.krw);
+      monthlyTotal = selectedMonthUsd +
+          currencyProvider.convertToBaseCurrency(selectedMonthKrw, Currency.krw);
       currencySymbol = '\$';
       decimalDigits = 2;
     }
 
+    // 현재 월일 때만 주간 합계 계산
+    double weeklyTotal = 0;
+    if (isCurrentMonth) {
+      final weeklyKrw = subscriptionProvider.getWeeklyTotal(Currency.krw);
+      final weeklyUsd = subscriptionProvider.getWeeklyTotal(Currency.usd);
+
+      if (currencyProvider.isKrwBase) {
+        weeklyTotal = weeklyKrw +
+            currencyProvider.convertToBaseCurrency(weeklyUsd, Currency.usd);
+      } else {
+        weeklyTotal = weeklyUsd +
+            currencyProvider.convertToBaseCurrency(weeklyKrw, Currency.krw);
+      }
+    }
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        children: [
-          Expanded(
-            child: _buildSummaryCard(
-              context: context,
-              title: languageProvider.tr('weeklyTotal').toUpperCase(),
-              subtitle: _getWeeklyRangeText(languageProvider), // 날짜 범위 추가
-              totalAmount: weeklyTotal,
-              currencySymbol: currencySymbol,
-              decimalDigits: decimalDigits,
-              isDark: isDark,
-              noSubscriptionsText: languageProvider.tr('noSubscriptions'),
-              onTap: () => _showDetailSheet(
-                context,
-                "${languageProvider.tr('weeklyTotal')} ${_getWeeklyRangeText(languageProvider)}",
-                subscriptionProvider.subscriptions,
-                isDark,
-                languageProvider,
-              ),
+      child: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 300),
+        transitionBuilder: (child, animation) {
+          return FadeTransition(
+            opacity: animation,
+            child: SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0, 0.1),
+                end: Offset.zero,
+              ).animate(CurvedAnimation(
+                parent: animation,
+                curve: Curves.easeOutCubic,
+              )),
+              child: child,
             ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: _buildSummaryCard(
-              context: context,
-              title: languageProvider.tr('monthlyTotal').toUpperCase(),
-              subtitle: _getCurrentMonthText(languageProvider), // 이번 달 추가
-              totalAmount: monthlyTotal,
-              currencySymbol: currencySymbol,
-              decimalDigits: decimalDigits,
-              isDark: isDark,
-              noSubscriptionsText: languageProvider.tr('noSubscriptions'),
-              onTap: () => _showDetailSheet(
-                context,
-                "${languageProvider.tr('monthlyTotal')} ${_getCurrentMonthText(languageProvider)}",
-                subscriptionProvider.subscriptions,
-                isDark,
-                languageProvider,
+          );
+        },
+        child: isCurrentMonth
+            // 현재 월: 주간 + 월간 카드
+            ? Row(
+                key: ValueKey('current_${focusedMonth.year}_${focusedMonth.month}'),
+                children: [
+                  Expanded(
+                    child: _buildSummaryCard(
+                      context: context,
+                      title: languageProvider.tr('weeklyTotal').toUpperCase(),
+                      subtitle: _getWeeklyRangeText(languageProvider),
+                      totalAmount: weeklyTotal,
+                      currencySymbol: currencySymbol,
+                      decimalDigits: decimalDigits,
+                      isDark: isDark,
+                      noSubscriptionsText: languageProvider.tr('noSubscriptions'),
+                      onTap: () => _showDetailSheet(
+                        context,
+                        "${languageProvider.tr('weeklyTotal')} ${_getWeeklyRangeText(languageProvider)}",
+                        subscriptionProvider.subscriptions,
+                        isDark,
+                        languageProvider,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _buildSummaryCard(
+                      context: context,
+                      title: languageProvider.tr('monthlyTotal').toUpperCase(),
+                      subtitle: _getMonthText(focusedMonth, languageProvider),
+                      totalAmount: monthlyTotal,
+                      currencySymbol: currencySymbol,
+                      decimalDigits: decimalDigits,
+                      isDark: isDark,
+                      noSubscriptionsText: languageProvider.tr('noSubscriptions'),
+                      onTap: () => _showDetailSheet(
+                        context,
+                        "${languageProvider.tr('monthlyTotal')} ${_getMonthText(focusedMonth, languageProvider)}",
+                        subscriptionProvider.subscriptions,
+                        isDark,
+                        languageProvider,
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            // 다른 월: 해당 월 합계만 (전체 너비)
+            : Container(
+                key: ValueKey('other_${focusedMonth.year}_${focusedMonth.month}'),
+                child: _buildSummaryCard(
+                  context: context,
+                  title: languageProvider.tr('monthlyTotal').toUpperCase(),
+                  subtitle: _getMonthText(focusedMonth, languageProvider),
+                  totalAmount: monthlyTotal,
+                  currencySymbol: currencySymbol,
+                  decimalDigits: decimalDigits,
+                  isDark: isDark,
+                  noSubscriptionsText: languageProvider.tr('noSubscriptions'),
+                  onTap: () => _showDetailSheet(
+                    context,
+                    "${languageProvider.tr('monthlyTotal')} ${_getMonthText(focusedMonth, languageProvider)}",
+                    subscriptionProvider.subscriptions,
+                    isDark,
+                    languageProvider,
+                  ),
+                ),
               ),
-            ),
-          ),
-        ],
       ),
     );
   }

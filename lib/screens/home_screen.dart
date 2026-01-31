@@ -52,7 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       _buildCalendar(context, subscriptionProvider, isDark,
                           languageProvider),
                       const SizedBox(height: 20),
-                      const SummaryCards(),
+                      SummaryCards(focusedMonth: _focusedDay),
                       const SizedBox(height: 32),
                     ],
                   ),

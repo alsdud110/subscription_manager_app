@@ -84,21 +84,26 @@ class SubscriptionProvider extends ChangeNotifier {
 
   double getMonthlyTotal(Currency currency) {
     final now = DateTime.now();
-    final daysInMonth = DateTime(now.year, now.month + 1, 0).day;
-    
+    return getMonthlyTotalForMonth(now, currency);
+  }
+
+  // 특정 월의 합계 계산
+  double getMonthlyTotalForMonth(DateTime month, Currency currency) {
+    final daysInMonth = DateTime(month.year, month.month + 1, 0).day;
+
     double total = 0.0;
-    
+
     for (int day = 1; day <= daysInMonth; day++) {
-      final date = DateTime(now.year, now.month, day);
+      final date = DateTime(month.year, month.month, day);
       final subs = getSubscriptionsForDate(date);
-      
+
       for (var sub in subs) {
         if (sub.currency == currency) {
           total += sub.amount;
         }
       }
     }
-    
+
     return total;
   }
 }
