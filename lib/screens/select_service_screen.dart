@@ -43,6 +43,7 @@ class _SelectServiceScreenState extends State<SelectServiceScreen> {
       appBar: AppBar(
         backgroundColor: isDark ? AppColors.black : AppColors.white,
         surfaceTintColor: Colors.transparent,
+        automaticallyImplyLeading: !widget.isFirstLaunch,
         centerTitle: true,
         title: Text(
           languageProvider.tr('selectService'),

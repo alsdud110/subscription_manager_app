@@ -12,6 +12,7 @@ import '../widgets/summary_cards.dart';
 import 'select_service_screen.dart';
 import 'settings_screen.dart';
 import '../utils/page_transitions.dart';
+import '../widgets/banner_ad_widget.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -36,6 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: isDark ? AppColors.black : AppColors.white,
       appBar: _buildAppBar(context, themeProvider, languageProvider, isDark),
       floatingActionButton: _buildFab(context, isDark),
+      bottomNavigationBar: const BannerAdWidget(),
       body: subscriptionProvider.isLoading
           ? const Center(child: CircularProgressIndicator())
           : AnimationLimiter(
@@ -71,6 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return AppBar(
       backgroundColor: isDark ? AppColors.black : AppColors.white,
       surfaceTintColor: Colors.transparent,
+      automaticallyImplyLeading: false,
       title: Row(
         mainAxisSize: MainAxisSize.min,
         children: [

@@ -7,6 +7,7 @@ import '../constants/services.dart';
 import '../models/subscription.dart';
 import '../providers/subscription_provider.dart';
 import '../providers/language_provider.dart';
+import '../widgets/banner_ad_widget.dart';
 
 class AddSubscriptionScreen extends StatefulWidget {
   final ServiceInfo? selectedService;
@@ -147,6 +148,7 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
     return Scaffold(
       backgroundColor: isDark ? AppColors.black : AppColors.white,
       appBar: _buildAppBar(context, isDark, languageProvider),
+      bottomNavigationBar: const BannerAdWidget(),
       body: Form(
         key: _formKey,
         child: ListView(

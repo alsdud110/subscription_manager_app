@@ -8,6 +8,7 @@ import '../providers/theme_provider.dart';
 import '../providers/language_provider.dart';
 import '../providers/currency_provider.dart';
 import '../providers/subscription_provider.dart';
+import '../widgets/banner_ad_widget.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -23,6 +24,7 @@ class SettingsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: isDark ? AppColors.black : AppColors.lightGray,
       appBar: _buildAppBar(context, isDark, languageProvider),
+      bottomNavigationBar: const BannerAdWidget(),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
         children: [
