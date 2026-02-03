@@ -98,11 +98,15 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
   void _scrollToSelectedDay() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_dayScrollController.hasClients) {
-        final itemWidth = 54.0; // 46 + 8 margin
+        const itemWidth = 54.0; // 46 + 8 margin
         final screenWidth = MediaQuery.of(context).size.width;
-        final targetOffset = ((_dayOfMonth - 1) * itemWidth) - (screenWidth / 2) + (itemWidth / 2) + 4;
+        final targetOffset = ((_dayOfMonth - 1) * itemWidth) -
+            (screenWidth / 2) +
+            (itemWidth / 2) +
+            4;
         _dayScrollController.animateTo(
-          targetOffset.clamp(0.0, _dayScrollController.position.maxScrollExtent),
+          targetOffset.clamp(
+              0.0, _dayScrollController.position.maxScrollExtent),
           duration: const Duration(milliseconds: 400),
           curve: Curves.easeOutCubic,
         );
@@ -113,11 +117,15 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
   void _scrollToSelectedWeekday() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_weekdayScrollController.hasClients) {
-        final itemWidth = 70.0; // 요일 아이템 평균 너비
+        const itemWidth = 70.0; // 요일 아이템 평균 너비
         final screenWidth = MediaQuery.of(context).size.width;
-        final targetOffset = ((_dayOfWeek - 1) * itemWidth) - (screenWidth / 2) + (itemWidth / 2) + 4;
+        final targetOffset = ((_dayOfWeek - 1) * itemWidth) -
+            (screenWidth / 2) +
+            (itemWidth / 2) +
+            4;
         _weekdayScrollController.animateTo(
-          targetOffset.clamp(0.0, _weekdayScrollController.position.maxScrollExtent),
+          targetOffset.clamp(
+              0.0, _weekdayScrollController.position.maxScrollExtent),
           duration: const Duration(milliseconds: 400),
           curve: Curves.easeOutCubic,
         );
@@ -128,11 +136,15 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
   void _scrollToSelectedMonth() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_monthScrollController.hasClients) {
-        final itemWidth = 70.0; // 월 아이템 평균 너비
+        const itemWidth = 70.0; // 월 아이템 평균 너비
         final screenWidth = MediaQuery.of(context).size.width;
-        final targetOffset = ((_month - 1) * itemWidth) - (screenWidth / 2) + (itemWidth / 2) + 4;
+        final targetOffset = ((_month - 1) * itemWidth) -
+            (screenWidth / 2) +
+            (itemWidth / 2) +
+            4;
         _monthScrollController.animateTo(
-          targetOffset.clamp(0.0, _monthScrollController.position.maxScrollExtent),
+          targetOffset.clamp(
+              0.0, _monthScrollController.position.maxScrollExtent),
           duration: const Duration(milliseconds: 400),
           curve: Curves.easeOutCubic,
         );
@@ -156,68 +168,69 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
           child: ListView(
             padding: const EdgeInsets.all(16),
             children: [
-            _buildServiceHeader(isDark),
-            const SizedBox(height: 24),
-            if (widget.selectedService == null) ...[
-              _buildSectionTitle(languageProvider.tr('serviceName'), isDark),
-              const SizedBox(height: 12),
-              _buildServiceNameField(isDark, languageProvider),
+              _buildServiceHeader(isDark),
               const SizedBox(height: 24),
-              _buildSectionTitle(languageProvider.tr('selectColor'), isDark),
-              const SizedBox(height: 12),
-              _buildColorSelector(isDark),
-              const SizedBox(height: 24),
-            ],
-            _buildSectionTitle(languageProvider.tr('price'), isDark),
-            const SizedBox(height: 12),
-            _buildPriceRow(isDark, languageProvider),
-            const SizedBox(height: 24),
-            Row(
-              children: [
-                _buildSectionTitle(languageProvider.tr('billingCycle'), isDark),
-                if (!_billingCycleSelected) ...[
-                  const SizedBox(width: 8),
-                  Text(
-                    '- ${languageProvider.tr('selectBillingCycle')}',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: AppColors.purple,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
+              if (widget.selectedService == null) ...[
+                _buildSectionTitle(languageProvider.tr('serviceName'), isDark),
+                const SizedBox(height: 12),
+                _buildServiceNameField(isDark, languageProvider),
+                const SizedBox(height: 24),
+                _buildSectionTitle(languageProvider.tr('selectColor'), isDark),
+                const SizedBox(height: 12),
+                _buildColorSelector(isDark),
+                const SizedBox(height: 24),
               ],
-            ),
-            const SizedBox(height: 12),
-            _buildBillingCycleSelector(isDark, languageProvider),
-            // 결제 주기 선택 후 결제일 옵션만 fade in
-            AnimatedSize(
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeOutCubic,
-              child: AnimatedOpacity(
-                duration: const Duration(milliseconds: 300),
-                opacity: _billingCycleSelected ? 1.0 : 0.0,
-                child: _billingCycleSelected
-                    ? Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 20),
-                          _buildBillingCycleOptions(isDark, languageProvider),
-                        ],
-                      )
-                    : const SizedBox.shrink(),
+              _buildSectionTitle(languageProvider.tr('price'), isDark),
+              const SizedBox(height: 12),
+              _buildPriceRow(isDark, languageProvider),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  _buildSectionTitle(
+                      languageProvider.tr('billingCycle'), isDark),
+                  if (!_billingCycleSelected) ...[
+                    const SizedBox(width: 8),
+                    Text(
+                      '- ${languageProvider.tr('selectBillingCycle')}',
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: AppColors.purple,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ],
               ),
-            ),
-            const SizedBox(height: 24),
-            _buildStartDateSection(isDark, languageProvider),
-            const SizedBox(height: 24),
-            _buildEndDateSection(isDark, languageProvider),
-            const SizedBox(height: 32),
-            _buildSubmitButton(context, isDark, languageProvider),
-            const SizedBox(height: 16),
-          ],
+              const SizedBox(height: 12),
+              _buildBillingCycleSelector(isDark, languageProvider),
+              // 결제 주기 선택 후 결제일 옵션만 fade in
+              AnimatedSize(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeOutCubic,
+                child: AnimatedOpacity(
+                  duration: const Duration(milliseconds: 300),
+                  opacity: _billingCycleSelected ? 1.0 : 0.0,
+                  child: _billingCycleSelected
+                      ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 20),
+                            _buildBillingCycleOptions(isDark, languageProvider),
+                          ],
+                        )
+                      : const SizedBox.shrink(),
+                ),
+              ),
+              const SizedBox(height: 24),
+              _buildStartDateSection(isDark, languageProvider),
+              const SizedBox(height: 24),
+              _buildEndDateSection(isDark, languageProvider),
+              const SizedBox(height: 32),
+              _buildSubmitButton(context, isDark, languageProvider),
+              const SizedBox(height: 16),
+            ],
+          ),
         ),
-      ),
       ),
     );
   }
@@ -236,7 +249,8 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
         icon: Container(
           padding: const EdgeInsets.all(6),
           decoration: BoxDecoration(
-            color: isDark ? AppColors.darkSurfaceContainer : AppColors.lightGray,
+            color:
+                isDark ? AppColors.darkSurfaceContainer : AppColors.lightGray,
             borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(
@@ -691,7 +705,8 @@ class _AddSubscriptionScreenState extends State<AddSubscriptionScreen> {
     return '${months[date.month - 1]} ${date.day}, ${date.year}';
   }
 
-  Widget _buildStartDateSection(bool isDark, LanguageProvider languageProvider) {
+  Widget _buildStartDateSection(
+      bool isDark, LanguageProvider languageProvider) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

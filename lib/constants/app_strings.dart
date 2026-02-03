@@ -21,7 +21,8 @@ class AppStrings {
     'subscriptionManager': '구독잇',
 
     // Home Screen
-    'noSubscriptions': '등록된 서비스가 없습니다',
+    'noSubscriptions': '서비스 없음',
+    'noSubscriptionsTip': '등록된 서비스가 없습니다',
     'skipForNow': '나중에 하기',
 
     // Settings Screen
@@ -190,7 +191,8 @@ class AppStrings {
     'subscriptionManager': 'Subit',
 
     // Home Screen
-    'noSubscriptions': 'No registered services',
+    'noSubscriptions': 'No services',
+    'noSubscriptionTip': 'No registered services',
     'skipForNow': 'Later',
 
     // Settings Screen

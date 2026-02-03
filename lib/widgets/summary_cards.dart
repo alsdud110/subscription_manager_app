@@ -82,8 +82,10 @@ class SummaryCards extends StatelessWidget {
     final isCurrentMonth = _isCurrentMonth(focusedMonth);
 
     // 선택된 월의 합계 계산
-    final selectedMonthKrw = subscriptionProvider.getMonthlyTotalForMonth(focusedMonth, Currency.krw);
-    final selectedMonthUsd = subscriptionProvider.getMonthlyTotalForMonth(focusedMonth, Currency.usd);
+    final selectedMonthKrw = subscriptionProvider.getMonthlyTotalForMonth(
+        focusedMonth, Currency.krw);
+    final selectedMonthUsd = subscriptionProvider.getMonthlyTotalForMonth(
+        focusedMonth, Currency.usd);
 
     String currencySymbol;
     int decimalDigits;
@@ -91,12 +93,14 @@ class SummaryCards extends StatelessWidget {
 
     if (currencyProvider.isKrwBase) {
       monthlyTotal = selectedMonthKrw +
-          currencyProvider.convertToBaseCurrency(selectedMonthUsd, Currency.usd);
+          currencyProvider.convertToBaseCurrency(
+              selectedMonthUsd, Currency.usd);
       currencySymbol = '₩';
       decimalDigits = 0;
     } else {
       monthlyTotal = selectedMonthUsd +
-          currencyProvider.convertToBaseCurrency(selectedMonthKrw, Currency.krw);
+          currencyProvider.convertToBaseCurrency(
+              selectedMonthKrw, Currency.krw);
       currencySymbol = '\$';
       decimalDigits = 2;
     }
@@ -138,7 +142,8 @@ class SummaryCards extends StatelessWidget {
         child: isCurrentMonth
             // 현재 월: 주간 + 월간 카드
             ? Row(
-                key: ValueKey('current_${focusedMonth.year}_${focusedMonth.month}'),
+                key: ValueKey(
+                    'current_${focusedMonth.year}_${focusedMonth.month}'),
                 children: [
                   Expanded(
                     child: _buildSummaryCard(
@@ -149,11 +154,16 @@ class SummaryCards extends StatelessWidget {
                       currencySymbol: currencySymbol,
                       decimalDigits: decimalDigits,
                       isDark: isDark,
-                      noSubscriptionsText: languageProvider.tr('noSubscriptions'),
+                      noSubscriptionsText:
+                          languageProvider.tr('noSubscriptions'),
                       onTap: () {
-                        final weeklySubs = subscriptionProvider.getWeeklySubscriptions();
+                        final weeklySubs =
+                            subscriptionProvider.getWeeklySubscriptions();
                         if (weeklySubs.isEmpty) {
-                          _showToast(context, languageProvider.tr('noSubscriptions'), isDark);
+                          _showToast(
+                              context,
+                              languageProvider.tr('noSubscriptionsTip'),
+                              isDark);
                         } else {
                           _showDetailSheet(
                             context,
@@ -176,11 +186,16 @@ class SummaryCards extends StatelessWidget {
                       currencySymbol: currencySymbol,
                       decimalDigits: decimalDigits,
                       isDark: isDark,
-                      noSubscriptionsText: languageProvider.tr('noSubscriptions'),
+                      noSubscriptionsText:
+                          languageProvider.tr('noSubscriptions'),
                       onTap: () {
-                        final monthlySubs = subscriptionProvider.getMonthlySubscriptions(focusedMonth);
+                        final monthlySubs = subscriptionProvider
+                            .getMonthlySubscriptions(focusedMonth);
                         if (monthlySubs.isEmpty) {
-                          _showToast(context, languageProvider.tr('noSubscriptions'), isDark);
+                          _showToast(
+                              context,
+                              languageProvider.tr('noSubscriptionsTip'),
+                              isDark);
                         } else {
                           _showDetailSheet(
                             context,
@@ -197,7 +212,8 @@ class SummaryCards extends StatelessWidget {
               )
             // 다른 월: 해당 월 합계만 (전체 너비)
             : Container(
-                key: ValueKey('other_${focusedMonth.year}_${focusedMonth.month}'),
+                key: ValueKey(
+                    'other_${focusedMonth.year}_${focusedMonth.month}'),
                 child: _buildSummaryCard(
                   context: context,
                   title: languageProvider.tr('monthlyTotal').toUpperCase(),
@@ -208,9 +224,11 @@ class SummaryCards extends StatelessWidget {
                   isDark: isDark,
                   noSubscriptionsText: languageProvider.tr('noSubscriptions'),
                   onTap: () {
-                    final monthlySubs = subscriptionProvider.getMonthlySubscriptions(focusedMonth);
+                    final monthlySubs = subscriptionProvider
+                        .getMonthlySubscriptions(focusedMonth);
                     if (monthlySubs.isEmpty) {
-                      _showToast(context, languageProvider.tr('noSubscriptions'), isDark);
+                      _showToast(context,
+                          languageProvider.tr('noSubscriptionsTip'), isDark);
                     } else {
                       _showDetailSheet(
                         context,
@@ -258,7 +276,7 @@ class SummaryCards extends StatelessWidget {
                 Text(
                   title,
                   style: TextStyle(
-                    fontSize: 11,
+                    fontSize: 9,
                     fontWeight: FontWeight.w700,
                     color: isDark ? AppColors.gray : Colors.grey[700],
                     letterSpacing: 0.5,
@@ -268,7 +286,7 @@ class SummaryCards extends StatelessWidget {
                 Text(
                   subtitle,
                   style: TextStyle(
-                    fontSize: 10,
+                    fontSize: 9,
                     fontWeight: FontWeight.w500,
                     color: isDark
                         ? AppColors.gray.withOpacity(0.7)

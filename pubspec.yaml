@@ -54,4 +54,4 @@ flutter:
   fonts:
     - family: Jalnan2
       fonts:
-        - asset: assets/fonts/BMJUA_ttf.ttf
+        - asset: assets/fonts/midbird_Regular.ttf
